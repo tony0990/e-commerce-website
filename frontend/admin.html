@@ -119,6 +119,33 @@
                 </table>
             </div>
         </div>
+        <!-- Order Modal -->
+        <div id="order-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center; animation: fadeIn 0.2s ease;">
+            <div style="background:white; padding:2.5rem; width:100%; max-width:650px; border-radius:16px; max-height:85vh; overflow-y:auto; position:relative; box-shadow:0 10px 40px rgba(0,0,0,0.2);">
+                <button onclick="document.getElementById('order-modal').style.display='none'" style="position:absolute; top:1.5rem; right:1.5rem; background:rgba(14,181,200,0.1); color:var(--cyan); border:none; width:36px; height:36px; border-radius:50%; font-size:1.2rem; cursor:pointer; display:flex; justify-content:center; align-items:center; transition:var(--transition);">&times;</button>
+                <h2 id="modal-order-title" style="margin-bottom:1.5rem; border-bottom:2px solid var(--gray-100); padding-bottom:.5rem;">Order Details</h2>
+                
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.5rem;">
+                    <div style="background:var(--gray-50); padding:1.25rem; border-radius:12px; border:1px solid var(--gray-200);">
+                        <h4 style="margin-bottom:0.75rem; color:var(--cyan); font-size:.9rem; text-transform:uppercase; letter-spacing:1px;"><i class="fas fa-user-circle"></i> Customer</h4>
+                        <div id="modal-user-info" style="display:flex; flex-direction:column; gap:0.4rem; font-size:0.95rem;"></div>
+                    </div>
+
+                    <div style="background:var(--gray-50); padding:1.25rem; border-radius:12px; border:1px solid var(--gray-200);">
+                        <h4 style="margin-bottom:0.75rem; color:var(--cyan); font-size:.9rem; text-transform:uppercase; letter-spacing:1px;"><i class="fas fa-truck"></i> Shipping</h4>
+                        <div id="modal-shipping-info" style="display:flex; flex-direction:column; gap:0.4rem; font-size:0.95rem;"></div>
+                    </div>
+                </div>
+
+                <h4 style="margin-bottom:0.75rem; color:var(--cyan); font-size:.9rem; text-transform:uppercase; letter-spacing:1px;"><i class="fas fa-shopping-basket"></i> Purchased Items</h4>
+                <div id="modal-items-list" style="display:flex; flex-direction:column; gap:0.75rem; background:var(--gray-50); border-radius:12px; padding:1.25rem; border:1px solid var(--gray-200);"></div>
+                
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem; border-top:2px solid var(--gray-100); padding-top:1rem;">
+                    <span style="font-weight:600; color:var(--gray-500);">Total Amount Paid</span>
+                    <h3 id="modal-total-price" style="font-size:1.75rem; color:var(--cyan); margin:0;"></h3>
+                </div>
+            </div>
+        </div>
     </main>
 
     <script type="module">
@@ -148,21 +175,25 @@
                     renderChart(stats.sales_over_time);
                 } else if (tab === 'orders') {
                     const orders = await api.getAllOrders();
+                    window.adminOrders = orders; // caching for clicking functionality
                     const body = document.getElementById('orders-table-body');
                     body.innerHTML = orders.map(order => `
-                        <tr style="border-bottom: 1px solid var(--gray-100);">
-                            <td style="padding: 1.25rem;">#${order.id}</td>
-                            <td style="padding: 1.25rem;">User ID: ${order.user_id}</td>
-                            <td style="padding: 1.25rem; font-weight: 600;">$${order.total_amount.toFixed(2)}</td>
+                        <tr style="border-bottom: 1px solid var(--gray-100); cursor:pointer; transition:background 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'" onclick="viewOrder(${order.id})">
+                            <td style="padding: 1.25rem; color:var(--cyan); font-weight:600;">#${order.id}</td>
+                            <td style="padding: 1.25rem;">
+                                <div style="font-weight:600;">${order.user?.first_name || 'System'} ${order.user?.last_name || 'User'}</div>
+                                <div style="font-size:0.8rem; color:var(--gray-500);">${order.user?.email || 'N/A'}</div>
+                            </td>
+                            <td style="padding: 1.25rem; font-weight: 700;">$${order.total_amount.toFixed(2)}</td>
                             <td style="padding: 1.25rem;">
                                 <span class="badge" style="background: ${order.payment_method === 'COD' ? '#fef3c7' : '#dcfce7'}; color: ${order.payment_method === 'COD' ? '#92400e' : '#166534'};">
-                                    ${order.payment_method}
+                                    <i class="${order.payment_method === 'COD' ? 'fas fa-money-bill-wave' : 'fas fa-credit-card'}"></i> ${order.payment_method}
                                 </span>
                             </td>
                             <td style="padding: 1.25rem;">
                                 <span class="badge" style="background: var(--gray-200); color: var(--gray-700);">${order.status}</span>
                             </td>
-                            <td style="padding: 1.25rem;"><button class="btn btn-secondary" style="padding: 0.3rem 0.6rem;">Update</button></td>
+                            <td style="padding: 1.25rem;"><button class="btn btn-secondary" style="padding: 0.3rem 0.6rem; font-size:0.8rem;" onclick="event.stopPropagation(); viewOrder(${order.id})"><i class="fas fa-eye"></i> View</button></td>
                         </tr>
                     `).join('');
                 } else if (tab === 'products') {
@@ -217,6 +248,45 @@
                 },
                 options: { responsive: true, plugins: { legend: { display: false } } }
             });
+        }
+
+        window.viewOrder = function(id) {
+            const order = window.adminOrders?.find(o => o.id === id);
+            if (!order) return;
+            
+            document.getElementById('modal-order-title').innerHTML = `<i class="fas fa-receipt" style="color:var(--gray-300);"></i> Order #${order.id} <span style="font-size:1rem; color:var(--gray-500); float:right; font-weight:500;">${new Date(order.created_at).toLocaleString()}</span>`;
+            
+            document.getElementById('modal-user-info').innerHTML = `
+                <div><strong style="color:var(--gray-500); font-weight:500;">Name:</strong> ${order.user?.first_name || ''} ${order.user?.last_name || ''}</div>
+                <div><strong style="color:var(--gray-500); font-weight:500;">Email:</strong> ${order.user?.email || 'N/A'}</div>
+                <div><strong style="color:var(--gray-500); font-weight:500;">Phone:</strong> ${order.user?.phone || 'Not Provided'}</div>
+                <div><strong style="color:var(--gray-500); font-weight:500;">Role:</strong> <span class="badge" style="background:var(--gray-200);">${(order.user?.role || 'Guest').toUpperCase()}</span></div>
+            `;
+
+            document.getElementById('modal-shipping-info').innerHTML = `
+                <div style="line-height:1.4;"><strong style="color:var(--gray-500); font-weight:500;">Address:</strong><br>${order.shipping_address}<br>${order.shipping_city}, ${order.shipping_state || ''} ${order.shipping_zip}<br>${order.shipping_country}</div>
+                <div style="margin-top:.5rem;"><strong style="color:var(--gray-500); font-weight:500;">Status:</strong> <span class="badge" style="background:var(--info); color:white;">${order.status}</span></div>
+            `;
+
+            const itemsHtml = (order.items || []).map(item => `
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--gray-200); padding-bottom:0.75rem;">
+                    <div style="display:flex; align-items:center; gap:1rem;">
+                        <div style="width:50px; height:50px; background:white; border:1px solid var(--gray-200); border-radius:8px; display:flex; justify-content:center; align-items:center;">
+                            <img src="${item.product?.image_url || ''}" style="max-width:40px; max-height:40px; object-fit:contain;" onerror="this.src=''; this.outerHTML='<i class=\\'fas fa-box\\' style=\\'color:var(--gray-300); font-size:1.5rem;\\'></i>'">
+                        </div>
+                        <div>
+                            <div style="font-weight:600; font-size:0.95rem; color:var(--text);">${item.product?.name || 'Unknown Product'}</div>
+                            <div style="color:var(--gray-500); font-size:0.85rem; margin-top:0.2rem;">Qty: <span style="font-weight:600; color:var(--gray-700);">${item.quantity}</span>  &times;  $${item.unit_price.toFixed(2)}</div>
+                        </div>
+                    </div>
+                    <div style="font-weight:700; font-size:1.1rem; color:var(--text);">$${item.total_price.toFixed(2)}</div>
+                </div>
+            `).join('');
+            
+            document.getElementById('modal-items-list').innerHTML = itemsHtml || '<div style="color:var(--gray-400); text-align:center;">No items found.</div>';
+            document.getElementById('modal-total-price').textContent = `$${order.total_amount.toFixed(2)}`;
+            
+            document.getElementById('order-modal').style.display = 'flex';
         }
 
         document.getElementById('logout-btn').addEventListener('click', () => api.logout());

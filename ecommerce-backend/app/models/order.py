@@ -42,8 +42,8 @@ class Order(Base):
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
-    user = relationship("User", backref="orders")
-    items = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
+    user = relationship("User", backref="orders", lazy="selectin")
+    items = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan", lazy="selectin")
 
     def __repr__(self):
         return f"<Order(id={self.id}, user_id={self.user_id}, status='{self.status}')>"
@@ -62,7 +62,7 @@ class OrderItem(Base):
     total_price = Column(Float, nullable=False)
 
     order = relationship("Order", back_populates="items")
-    product = relationship("Product")
+    product = relationship("Product", lazy="selectin")
 
     def __repr__(self):
         return f"<OrderItem(id={self.id}, order_id={self.order_id}, product_id={self.product_id})>"

@@ -12,14 +12,16 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from app.core.config import settings
 from app.core.database import create_tables, engine
+from app.core.seeder import seed_data
 from app.api.router import api_router
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan events - startup and shutdown."""
-    # Startup: Create database tables
+    # Startup: Create database tables and seed
     await create_tables()
+    await seed_data()
     print(f"[*] {settings.APP_NAME} v{settings.APP_VERSION} starting up...")
     print(f"[*] Environment: {settings.APP_ENV}")
     print(f"[*] Docs: http://{settings.HOST}:{settings.PORT}/docs")
@@ -38,8 +40,9 @@ app = FastAPI(
         "Supports JWT authentication, role-based access control, "
         "user management, and more."
     ),
-    docs_url="/docs",
-    redoc_url="/redoc",
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
     lifespan=lifespan,
 )
 
@@ -51,7 +54,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )

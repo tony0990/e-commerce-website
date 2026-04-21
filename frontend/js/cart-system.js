@@ -42,4 +42,23 @@ class Cart {
 }
 
 const cart = new Cart();
+
+// Intercept profile icon clicks
+document.addEventListener('DOMContentLoaded', () => {
+  const token = localStorage.getItem('token');
+  const userStr = localStorage.getItem('user');
+
+  if (token && userStr) {
+    try {
+      const user = JSON.parse(userStr);
+      const targetHref = user.role === 'admin' ? 'admin.html' : 'profile.html';
+      
+      // Update all anchor tags pointing to auth.html to the correct dashboard
+      document.querySelectorAll('a[href="auth.html"]').forEach(a => {
+        a.href = targetHref;
+      });
+    } catch(err) {}
+  }
+});
+
 export { cart, DELIVERY_FEE };

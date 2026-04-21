@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 from datetime import datetime
 from app.core.constants import OrderStatus, PaymentStatus
 from app.schemas.product import ProductResponse
+from app.schemas.user import UserResponse
 
 
 class OrderItemBase(BaseModel):
@@ -43,7 +44,7 @@ class OrderCreate(OrderBase):
 class OrderUpdate(BaseModel):
     status: Optional[OrderStatus] = None
     payment_status: Optional[PaymentStatus] = None
-    tracking_number: Optional[String] = None
+    tracking_number: Optional[str] = None
 
 
 class OrderResponse(OrderBase):
@@ -55,6 +56,7 @@ class OrderResponse(OrderBase):
     status: OrderStatus
     payment_status: PaymentStatus
     created_at: datetime
+    user: Optional[UserResponse] = None
     items: List[OrderItemResponse]
 
     class Config:

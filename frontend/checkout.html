@@ -187,7 +187,6 @@ document.getElementById('checkout-form').addEventListener('submit', async e => {
 
   const payMethod = document.querySelector('input[name=payment]:checked').value;
 
-  // Try backend if logged in; otherwise just clear cart
   try {
     const token = localStorage.getItem('token');
     if (token) {
@@ -205,13 +204,22 @@ document.getElementById('checkout-form').addEventListener('submit', async e => {
           notes: ''
         })
       });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.detail || 'Failed to place order');
+      }
     }
-  } catch (_) { /* backend offline — still show success */ }
-
-  cart.clear();
-  document.getElementById('success-method').textContent =
-    `Payment: ${payMethod === 'COD' ? '💵 Cash on Delivery' : '💳 Online Payment'}`;
-  document.getElementById('success-modal').classList.add('show');
+    
+    // Cart is successfully stored in backend
+    cart.clear();
+    document.getElementById('success-method').textContent =
+      `Payment: ${payMethod === 'COD' ? '💵 Cash on Delivery' : '💳 Online Payment'}`;
+    document.getElementById('success-modal').classList.add('show');
+  } catch (error) {
+    alert(`Order failed: ${error.message}`);
+    btn.disabled = false;
+    btn.innerHTML = 'Place Order <i class="fas fa-arrow-right"></i>';
+  }
 });
 
 cart._badge();

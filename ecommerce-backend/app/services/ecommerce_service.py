@@ -79,7 +79,8 @@ class OrderService:
                 product_id=product.id,
                 quantity=item_data.quantity,
                 unit_price=product.price,
-                total_price=item_total
+                total_price=item_total,
+                product=product
             ))
             
         order = Order(
