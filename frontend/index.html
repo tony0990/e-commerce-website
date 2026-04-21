@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Store | Your Ultimate E-Commerce Experience</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-shopping-bag"></i> PremiumStore
+            </a>
+            
+            <div class="search-bar">
+                <input type="text" placeholder="Search for products, brands and more...">
+            </div>
+
+            <nav class="nav-actions">
+                <a href="auth.html" class="nav-link" id="auth-link">Login</a>
+                <a href="cart.html" class="nav-link"><i class="fas fa-shopping-cart"></i> Cart</a>
+                <div id="user-menu" style="display: none;">
+                    <a href="profile.html" class="nav-link"><i class="fas fa-user-circle"></i> Profile</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero" style="background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') center/cover; height: 400px; display: flex; align-items: center; color: white;">
+            <div class="container animate-fade-in">
+                <h1 style="font-size: 3.5rem; margin-bottom: 1rem;">Premium Experience.</h1>
+                <p style="font-size: 1.25rem; margin-bottom: 2rem; max-width: 600px;">Discover the finest collection of products curated just for you. Quality meets elegance.</p>
+                <a href="products.html" class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1rem;">Shop Collection</a>
+            </div>
+        </section>
+
+        <!-- Featured Categories -->
+        <section class="container" style="padding: 4rem 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem;">
+                <h2 style="font-size: 2rem;">Shop by Category</h2>
+                <a href="products.html" style="color: var(--accent); text-decoration: none; font-weight: 600;">View All <i class="fas fa-arrow-right"></i></a>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem;">
+                <div class="card" style="text-align: center; cursor: pointer;">
+                    <i class="fas fa-laptop" style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;"></i>
+                    <h3>Electronics</h3>
+                    <p style="color: var(--gray-500); margin-top: 0.5rem;">The latest gadgets and tech.</p>
+                </div>
+                <div class="card" style="text-align: center; cursor: pointer;">
+                    <i class="fas fa-tshirt" style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;"></i>
+                    <h3>Fashion</h3>
+                    <p style="color: var(--gray-500); margin-top: 0.5rem;">Modern trends for everyone.</p>
+                </div>
+                <div class="card" style="text-align: center; cursor: pointer;">
+                    <i class="fas fa-couch" style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;"></i>
+                    <h3>Home & Living</h3>
+                    <p style="color: var(--gray-500); margin-top: 0.5rem;">Elevate your space.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer style="background-color: var(--gray-900); color: var(--white); padding: 4rem 0; margin-top: 4rem;">
+        <div class="container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 3rem;">
+            <div>
+                <h4 style="margin-bottom: 1.5rem;">PremiumStore</h4>
+                <p style="color: var(--gray-400); font-size: 0.9rem;">The world's leading e-commerce platform for high-quality goods.</p>
+            </div>
+            <div>
+                <h4 style="margin-bottom: 1.5rem;">Quick Links</h4>
+                <ul style="list-style: none; color: var(--gray-400); font-size: 0.9rem; line-height: 2;">
+                    <li><a href="#" style="color: inherit; text-decoration: none;">Help Center</a></li>
+                    <li><a href="#" style="color: inherit; text-decoration: none;">Returns & Refunds</a></li>
+                    <li><a href="#" style="color: inherit; text-decoration: none;">Shipping Info</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="margin-bottom: 1.5rem;">Newsletter</h4>
+                <p style="color: var(--gray-400); font-size: 0.9rem; margin-bottom: 1rem;">Subscribe to receive updates and exclusive offers.</p>
+                <div style="display: flex;">
+                    <input type="email" placeholder="Email address" style="padding: 0.6rem; border: none; border-radius: 4px 0 0 4px; flex: 1;">
+                    <button class="btn btn-primary" style="border-radius: 0 4px 4px 0;">Join</button>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import api from './js/api.js';
+        
+        // Simple auth check
+        if (localStorage.getItem('token')) {
+            document.getElementById('auth-link').style.display = 'none';
+            document.getElementById('user-menu').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

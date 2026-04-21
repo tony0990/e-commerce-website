@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Register | PremiumStore</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body style="display: flex; flex-direction: column; min-height: 100vh;">
+    <header>
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-shopping-bag"></i> PremiumStore
+            </a>
+        </div>
+    </header>
+
+    <main style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem;">
+        <div class="card animate-fade-in" style="width: 100%; max-width: 450px; padding: 2.5rem;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h2 id="form-title" style="font-size: 1.75rem;">Sign In</h2>
+                <p id="form-subtitle" style="color: var(--gray-500); margin-top: 0.5rem;">Welcome back to PremiumStore</p>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form">
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="login-email" class="form-control" placeholder="name@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="login-password" class="form-control" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Sign In</button>
+            </form>
+
+            <!-- Register Form (Hidden) -->
+            <form id="register-form" style="display: none;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label">First Name</label>
+                        <input type="text" id="reg-firstname" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" id="reg-lastname" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="reg-email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="reg-password" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Confirm Password</label>
+                    <input type="password" id="reg-confirm" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Create Account</button>
+            </form>
+
+            <div style="text-align: center; margin-top: 2rem; border-top: 1px solid var(--gray-200); padding-top: 1.5rem;">
+                <p id="toggle-text">New to PremiumStore? <a href="#" id="toggle-form" style="color: var(--accent); text-decoration: none; font-weight: 600;">Create an account</a></p>
+            </div>
+            
+            <div id="error-message" style="display: none; margin-top: 1.5rem; padding: 1rem; background-color: #fee2e2; color: #dc2626; border-radius: 6px; font-size: 0.875rem; text-align: center;">
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import api from './js/api.js';
+
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const toggleFormBtn = document.getElementById('toggle-form');
+        const formTitle = document.getElementById('form-title');
+        const formSubtitle = document.getElementById('form-subtitle');
+        const toggleText = document.getElementById('toggle-text');
+        const errorDiv = document.getElementById('error-message');
+
+        let isLogin = true;
+
+        toggleFormBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            isLogin = !isLogin;
+            loginForm.style.display = isLogin ? 'block' : 'none';
+            registerForm.style.display = isLogin ? 'none' : 'block';
+            formTitle.textContent = isLogin ? 'Sign In' : 'Create Account';
+            formSubtitle.textContent = isLogin ? 'Welcome back to PremiumStore' : 'Start your shopping journey today';
+            toggleText.innerHTML = isLogin ? 
+                'New to PremiumStore? <a href="#" id="toggle-form" style="color: var(--accent); text-decoration: none; font-weight: 600;">Create an account</a>' :
+                'Already have an account? <a href="#" id="toggle-form" style="color: var(--accent); text-decoration: none; font-weight: 600;">Sign in instead</a>';
+            
+            // Re-attach listener to new dynamic link
+            document.getElementById('toggle-form').addEventListener('click', (e) => {
+                e.preventDefault();
+                toggleFormBtn.click();
+            });
+            errorDiv.style.display = 'none';
+        });
+
+        const showError = (msg) => {
+            errorDiv.textContent = msg;
+            errorDiv.style.display = 'block';
+        };
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            errorDiv.style.display = 'none';
+            try {
+                const email = document.getElementById('login-email').value;
+                const pass = document.getElementById('login-password').value;
+                await api.login(email, pass);
+                window.location.href = 'index.html';
+            } catch (err) {
+                showError(err.message);
+            }
+        });
+
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            errorDiv.style.display = 'none';
+            try {
+                const userData = {
+                    email: document.getElementById('reg-email').value,
+                    password: document.getElementById('reg-password').value,
+                    confirm_password: document.getElementById('reg-confirm').value,
+                    first_name: document.getElementById('reg-firstname').value,
+                    last_name: document.getElementById('reg-lastname').value
+                };
+                await api.register(userData);
+                alert('Registration successful! Please sign in.');
+                toggleFormBtn.click();
+            } catch (err) {
+                showError(err.message);
+            }
+        });
+    </script>
+</body>
+</html>

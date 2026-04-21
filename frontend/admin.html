@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | PremiumStore</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body style="background-color: var(--gray-50);">
+    <header>
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-shopping-bag"></i> PremiumStore <span style="font-size: 0.8rem; background: var(--secondary); color: var(--gray-900); padding: 2px 8px; border-radius: 10px; margin-left: 5px;">ADMIN</span>
+            </a>
+            
+            <nav class="nav-actions">
+                <a href="profile.html" class="nav-link">Back to Profile</a>
+                <button id="logout-btn" class="btn btn-secondary" style="padding: 0.4rem 0.8rem;">Logout</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container" style="padding: 3rem 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem;">
+            <h1 style="font-size: 2.5rem;">User Management</h1>
+            <button class="btn btn-primary"><i class="fas fa-plus"></i> Add New User</button>
+        </div>
+
+        <!-- Stats Overview -->
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 3rem;">
+            <div class="card" style="border-left: 4px solid var(--info);">
+                <p style="font-size: 0.8rem; color: var(--gray-500); text-transform: uppercase; font-weight: 600;">Total Users</p>
+                <h3 style="font-size: 2rem; margin-top: 0.5rem;" id="total-users">--</h3>
+            </div>
+            <div class="card" style="border-left: 4px solid var(--success);">
+                <p style="font-size: 0.8rem; color: var(--gray-500); text-transform: uppercase; font-weight: 600;">Active Now</p>
+                <h3 style="font-size: 2rem; margin-top: 0.5rem;">--</h3>
+            </div>
+            <div class="card" style="border-left: 4px solid var(--warning);">
+                <p style="font-size: 0.8rem; color: var(--gray-500); text-transform: uppercase; font-weight: 600;">Pending Orders</p>
+                <h3 style="font-size: 2rem; margin-top: 0.5rem;">--</h3>
+            </div>
+            <div class="card" style="border-left: 4px solid var(--accent);">
+                <p style="font-size: 0.8rem; color: var(--gray-500); text-transform: uppercase; font-weight: 600;">Revenue (MTD)</p>
+                <h3 style="font-size: 2rem; margin-top: 0.5rem;">$12.4k</h3>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="card" style="padding: 0; overflow: hidden;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="background-color: var(--gray-100); border-bottom: 1px solid var(--gray-200);">
+                        <th style="padding: 1.25rem; font-weight: 600; color: var(--gray-700);">User</th>
+                        <th style="padding: 1.25rem; font-weight: 600; color: var(--gray-700);">Role</th>
+                        <th style="padding: 1.25rem; font-weight: 600; color: var(--gray-700);">Status</th>
+                        <th style="padding: 1.25rem; font-weight: 600; color: var(--gray-700);">Joined</th>
+                        <th style="padding: 1.25rem; font-weight: 600; color: var(--gray-700); text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="user-table-body">
+                    <!-- Dynamic Rows -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script type="module">
+        import api from './js/api.js';
+
+        async function init() {
+            try {
+                const result = await api.getAllUsers();
+                const users = result.data.items;
+                document.getElementById('total-users').textContent = result.data.total;
+                
+                const tableBody = document.getElementById('user-table-body');
+                tableBody.innerHTML = users.map(user => `
+                    <tr style="border-bottom: 1px solid var(--gray-100); transition: var(--transition);">
+                        <td style="padding: 1.25rem;">
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <div style="width: 35px; height: 35px; background: var(--gray-200); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: var(--gray-600);">
+                                    ${user.first_name[0]}${user.last_name[0]}
+                                </div>
+                                <div>
+                                    <p style="font-weight: 500;">${user.first_name} ${user.last_name}</p>
+                                    <p style="font-size: 0.75rem; color: var(--gray-500);">${user.email}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="padding: 1.25rem;">
+                            <span class="badge" style="background: ${user.role === 'admin' ? '#dcfce7' : '#f3f4f6'}; color: ${user.role === 'admin' ? '#166534' : '#374151'};">
+                                ${user.role}
+                            </span>
+                        </td>
+                        <td style="padding: 1.25rem;">
+                            <span style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.875rem;">
+                                <span style="width: 8px; height: 8px; border-radius: 50%; background: ${user.is_active ? 'var(--success)' : 'var(--error)'};"></span>
+                                ${user.is_active ? 'Active' : 'Inactive'}
+                            </span>
+                        </td>
+                        <td style="padding: 1.25rem; font-size: 0.875rem; color: var(--gray-600);">
+                            ${new Date(user.created_at).toLocaleDateString()}
+                        </td>
+                        <td style="padding: 1.25rem; text-align: right;">
+                            <button style="background: none; border: none; color: var(--gray-400); cursor: pointer; padding: 0.25rem;"><i class="fas fa-edit"></i></button>
+                            <button style="background: none; border: none; color: var(--gray-400); cursor: pointer; padding: 0.25rem; margin-left: 0.5rem;"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (err) {
+                console.error(err);
+                if (err.message.includes('permission')) {
+                    alert('Access Denied: Admin privileges required.');
+                    window.location.href = 'profile.html';
+                }
+            }
+        }
+
+        document.getElementById('logout-btn').addEventListener('click', () => api.logout());
+        init();
+    </script>
+</body>
+</html>
