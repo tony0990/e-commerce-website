@@ -1,9 +1,4 @@
-"""
-API Dependencies (Ahmed + Tony)
-================================
-FastAPI dependency injection functions.
-Provides current user, role-based access control, and database sessions.
-"""
+
 
 from typing import Optional
 from fastapi import Depends, Header

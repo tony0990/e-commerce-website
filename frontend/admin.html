@@ -6,6 +6,28 @@
     <title>Admin Dashboard | PremiumStore</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .admin-tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+            color: var(--gray-500);
+            transition: var(--transition);
+        }
+        .admin-tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
 </head>
 <body style="background-color: var(--gray-50);">
     <header>
@@ -21,106 +43,184 @@
         </div>
     </header>
 
-    <main class="container" style="padding: 3rem 1.5rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem;">
-            <h1 style="font-size: 2.5rem;">User Management</h1>
-            <button class="btn btn-primary"><i class="fas fa-plus"></i> Add New User</button>
+    <main class="container" style="padding: 2rem 1.5rem;">
+        <!-- Tab Navigation -->
+        <div style="display: flex; gap: 1rem; border-bottom: 1px solid var(--gray-200); margin-bottom: 2rem;">
+            <div class="admin-tab active" data-tab="analytics">Analytics</div>
+            <div class="admin-tab" data-tab="orders">Orders</div>
+            <div class="admin-tab" data-tab="products">Products</div>
+            <div class="admin-tab" data-tab="users">Users</div>
         </div>
 
-        <!-- Stats Overview -->
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 3rem;">
-            <div class="card" style="border-left: 4px solid var(--info);">
-                <p style="font-size: 0.8rem; color: var(--gray-500); text-transform: uppercase; font-weight: 600;">Total Users</p>
-                <h3 style="font-size: 2rem; margin-top: 0.5rem;" id="total-users">--</h3>
+        <!-- analytics Tab -->
+        <div id="analytics" class="tab-content active">
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 3rem;">
+                <div class="card" style="border-left: 4px solid var(--success);">
+                    <p style="font-size: 0.8rem; color: var(--gray-500); text-transform: uppercase;">Total Revenue</p>
+                    <h3 style="font-size: 2rem; margin-top: 0.5rem;" id="stat-revenue">$0</h3>
+                </div>
+                <div class="card" style="border-left: 4px solid var(--info);">
+                    <p style="font-size: 0.8rem; color: var(--gray-500); text-transform: uppercase;">Total Orders</p>
+                    <h3 style="font-size: 2rem; margin-top: 0.5rem;" id="stat-orders">0</h3>
+                </div>
+                <div class="card" style="border-left: 4px solid var(--warning);">
+                    <p style="font-size: 0.8rem; color: var(--gray-500); text-transform: uppercase;">Pending Orders</p>
+                    <h3 style="font-size: 2rem; margin-top: 0.5rem;" id="stat-pending">0</h3>
+                </div>
+                <div class="card" style="border-left: 4px solid var(--primary);">
+                    <p style="font-size: 0.8rem; color: var(--gray-500); text-transform: uppercase;">Total Users</p>
+                    <h3 style="font-size: 2rem; margin-top: 0.5rem;" id="stat-users">0</h3>
+                </div>
             </div>
-            <div class="card" style="border-left: 4px solid var(--success);">
-                <p style="font-size: 0.8rem; color: var(--gray-500); text-transform: uppercase; font-weight: 600;">Active Now</p>
-                <h3 style="font-size: 2rem; margin-top: 0.5rem;">--</h3>
-            </div>
-            <div class="card" style="border-left: 4px solid var(--warning);">
-                <p style="font-size: 0.8rem; color: var(--gray-500); text-transform: uppercase; font-weight: 600;">Pending Orders</p>
-                <h3 style="font-size: 2rem; margin-top: 0.5rem;">--</h3>
-            </div>
-            <div class="card" style="border-left: 4px solid var(--accent);">
-                <p style="font-size: 0.8rem; color: var(--gray-500); text-transform: uppercase; font-weight: 600;">Revenue (MTD)</p>
-                <h3 style="font-size: 2rem; margin-top: 0.5rem;">$12.4k</h3>
+
+            <div class="card" style="padding: 2rem;">
+                <h3 style="margin-bottom: 1.5rem;">Sales Performance</h3>
+                <canvas id="salesChart" height="100"></canvas>
             </div>
         </div>
 
-        <!-- Users Table -->
-        <div class="card" style="padding: 0; overflow: hidden;">
-            <table style="width: 100%; border-collapse: collapse; text-align: left;">
-                <thead>
-                    <tr style="background-color: var(--gray-100); border-bottom: 1px solid var(--gray-200);">
-                        <th style="padding: 1.25rem; font-weight: 600; color: var(--gray-700);">User</th>
-                        <th style="padding: 1.25rem; font-weight: 600; color: var(--gray-700);">Role</th>
-                        <th style="padding: 1.25rem; font-weight: 600; color: var(--gray-700);">Status</th>
-                        <th style="padding: 1.25rem; font-weight: 600; color: var(--gray-700);">Joined</th>
-                        <th style="padding: 1.25rem; font-weight: 600; color: var(--gray-700); text-align: right;">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="user-table-body">
-                    <!-- Dynamic Rows -->
-                </tbody>
-            </table>
+        <!-- Orders Tab -->
+        <div id="orders" class="tab-content">
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: var(--gray-100); text-align: left;">
+                            <th style="padding: 1.25rem;">Order ID</th>
+                            <th style="padding: 1.25rem;">Customer</th>
+                            <th style="padding: 1.25rem;">Total</th>
+                            <th style="padding: 1.25rem;">Payment</th>
+                            <th style="padding: 1.25rem;">Status</th>
+                            <th style="padding: 1.25rem;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Products Tab -->
+        <div id="products" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2>Inventory Management</h2>
+                <button class="btn btn-primary" id="add-product-btn"><i class="fas fa-plus"></i> Add Product</button>
+            </div>
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tbody id="products-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="users" class="tab-content">
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tbody id="users-table-body"></tbody>
+                </table>
+            </div>
         </div>
     </main>
 
     <script type="module">
         import api from './js/api.js';
 
-        async function init() {
-            try {
-                const result = await api.getAllUsers();
-                const users = result.data.items;
-                document.getElementById('total-users').textContent = result.data.total;
-                
-                const tableBody = document.getElementById('user-table-body');
-                tableBody.innerHTML = users.map(user => `
-                    <tr style="border-bottom: 1px solid var(--gray-100); transition: var(--transition);">
-                        <td style="padding: 1.25rem;">
-                            <div style="display: flex; align-items: center; gap: 1rem;">
-                                <div style="width: 35px; height: 35px; background: var(--gray-200); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: var(--gray-600);">
-                                    ${user.first_name[0]}${user.last_name[0]}
-                                </div>
-                                <div>
-                                    <p style="font-weight: 500;">${user.first_name} ${user.last_name}</p>
-                                    <p style="font-size: 0.75rem; color: var(--gray-500);">${user.email}</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td style="padding: 1.25rem;">
-                            <span class="badge" style="background: ${user.role === 'admin' ? '#dcfce7' : '#f3f4f6'}; color: ${user.role === 'admin' ? '#166534' : '#374151'};">
-                                ${user.role}
-                            </span>
-                        </td>
-                        <td style="padding: 1.25rem;">
-                            <span style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.875rem;">
-                                <span style="width: 8px; height: 8px; border-radius: 50%; background: ${user.is_active ? 'var(--success)' : 'var(--error)'};"></span>
-                                ${user.is_active ? 'Active' : 'Inactive'}
-                            </span>
-                        </td>
-                        <td style="padding: 1.25rem; font-size: 0.875rem; color: var(--gray-600);">
-                            ${new Date(user.created_at).toLocaleDateString()}
-                        </td>
-                        <td style="padding: 1.25rem; text-align: right;">
-                            <button style="background: none; border: none; color: var(--gray-400); cursor: pointer; padding: 0.25rem;"><i class="fas fa-edit"></i></button>
-                            <button style="background: none; border: none; color: var(--gray-400); cursor: pointer; padding: 0.25rem; margin-left: 0.5rem;"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
-                `).join('');
+        const tabs = document.querySelectorAll('.admin-tab');
+        const contents = document.querySelectorAll('.tab-content');
 
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+                loadTabData(tab.dataset.tab);
+            });
+        });
+
+        async function loadTabData(tab) {
+            try {
+                if (tab === 'analytics') {
+                    const stats = await api.getAdminStats();
+                    document.getElementById('stat-revenue').textContent = `$${stats.total_revenue.toLocaleString()}`;
+                    document.getElementById('stat-orders').textContent = stats.total_orders;
+                    document.getElementById('stat-pending').textContent = stats.pending_orders;
+                    document.getElementById('stat-users').textContent = stats.total_users;
+                    renderChart(stats.sales_over_time);
+                } else if (tab === 'orders') {
+                    const orders = await api.getAllOrders();
+                    const body = document.getElementById('orders-table-body');
+                    body.innerHTML = orders.map(order => `
+                        <tr style="border-bottom: 1px solid var(--gray-100);">
+                            <td style="padding: 1.25rem;">#${order.id}</td>
+                            <td style="padding: 1.25rem;">User ID: ${order.user_id}</td>
+                            <td style="padding: 1.25rem; font-weight: 600;">$${order.total_amount.toFixed(2)}</td>
+                            <td style="padding: 1.25rem;">
+                                <span class="badge" style="background: ${order.payment_method === 'COD' ? '#fef3c7' : '#dcfce7'}; color: ${order.payment_method === 'COD' ? '#92400e' : '#166534'};">
+                                    ${order.payment_method}
+                                </span>
+                            </td>
+                            <td style="padding: 1.25rem;">
+                                <span class="badge" style="background: var(--gray-200); color: var(--gray-700);">${order.status}</span>
+                            </td>
+                            <td style="padding: 1.25rem;"><button class="btn btn-secondary" style="padding: 0.3rem 0.6rem;">Update</button></td>
+                        </tr>
+                    `).join('');
+                } else if (tab === 'products') {
+                    const result = await api.getProducts({ page_size: 100 });
+                    const body = document.getElementById('products-table-body');
+                    body.innerHTML = result.items.map(p => `
+                        <tr style="border-bottom: 1px solid var(--gray-100);">
+                            <td style="padding: 1rem;"><img src="${p.image_url}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"></td>
+                            <td style="padding: 1rem; font-weight: 500;">${p.name}</td>
+                            <td style="padding: 1rem; color: var(--accent); font-weight: 600;">$${p.price.toFixed(2)}</td>
+                            <td style="padding: 1rem;">Stock: ${p.stock}</td>
+                            <td style="padding: 1rem; text-align: right;">
+                                <button style="background: none; border: none; cursor: pointer; color: var(--gray-400);"><i class="fas fa-edit"></i></button>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else if (tab === 'users') {
+                    const result = await api.getAllUsers();
+                    const body = document.getElementById('users-table-body');
+                    body.innerHTML = result.data.items.map(u => `
+                        <tr style="border-bottom: 1px solid var(--gray-100);">
+                            <td style="padding: 1rem;">${u.first_name} ${u.last_name}</td>
+                            <td style="padding: 1rem; color: var(--gray-500);">${u.email}</td>
+                            <td style="padding: 1rem;">${u.role.toUpperCase()}</td>
+                            <td style="padding: 1rem; text-align: right;">
+                                <button style="background: none; border: none; cursor: pointer; color: var(--error);"><i class="fas fa-ban"></i></button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
             } catch (err) {
                 console.error(err);
-                if (err.message.includes('permission')) {
-                    alert('Access Denied: Admin privileges required.');
-                    window.location.href = 'profile.html';
-                }
             }
         }
 
+        let chart;
+        function renderChart(data) {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(d => d.date),
+                    datasets: [{
+                        label: 'Daily Revenue ($)',
+                        data: data.map(d => d.revenue),
+                        borderColor: '#e47911',
+                        backgroundColor: 'rgba(228, 121, 17, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } } }
+            });
+        }
+
         document.getElementById('logout-btn').addEventListener('click', () => api.logout());
-        init();
+        loadTabData('analytics');
     </script>
 </body>
 </html>

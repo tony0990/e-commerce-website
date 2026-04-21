@@ -1,0 +1,25 @@
+
+
+
+
+docker compose exec api python scripts/create_admin.py
+
+docker compose ps
+
+cd "C:\Users\tonyh\Documents\GitHub\e-commerce-website\frontend"
+python -m http.server 5500
+
+
+
+
+
+
+http://localhost:5500
+
+
+http://localhost:8000/health
+
+
+
+
+http://localhost:8000

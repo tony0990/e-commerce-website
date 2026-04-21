@@ -20,7 +20,7 @@
 
             <nav class="nav-actions">
                 <a href="auth.html" class="nav-link" id="auth-link">Login</a>
-                <a href="cart.html" class="nav-link"><i class="fas fa-shopping-cart"></i> Cart</a>
+                <a href="cart.html" class="nav-link"><i class="fas fa-shopping-cart"></i> Cart <span id="cart-count" class="badge" style="background: var(--accent); color: white; display: none;">0</span></a>
                 <div id="user-menu" style="display: none;">
                     <a href="profile.html" class="nav-link"><i class="fas fa-user-circle"></i> Profile</a>
                 </div>
@@ -38,66 +38,40 @@
                 
                 <div style="margin-bottom: 2rem;">
                     <h4 style="font-size: 1rem; margin-bottom: 1rem;">Categories</h4>
-                    <ul style="list-style: none; line-height: 2.2;">
-                        <li><input type="checkbox" id="cat-elec"> <label for="cat-elec">Electronics</label></li>
-                        <li><input type="checkbox" id="cat-fash"> <label for="cat-fash">Fashion</label></li>
-                        <li><input type="checkbox" id="cat-home"> <label for="cat-home">Home & Living</label></li>
-                        <li><input type="checkbox" id="cat-beauty"> <label for="cat-beauty">Beauty</label></li>
+                    <ul id="category-list" style="list-style: none; line-height: 2.2;">
+                        <!-- Dynamic Categories -->
                     </ul>
                 </div>
 
                 <div style="margin-bottom: 2rem;">
                     <h4 style="font-size: 1rem; margin-bottom: 1rem;">Price Range</h4>
-                    <input type="range" style="width: 100%; accent-color: var(--secondary);">
+                    <input type="range" id="price-range" min="0" max="2000" step="50" style="width: 100%; accent-color: var(--accent);">
                     <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-top: 0.5rem;">
                         <span>$0</span>
-                        <span>$5000+</span>
+                        <span id="price-display">$2000+</span>
                     </div>
                 </div>
 
-                <button class="btn btn-secondary" style="width: 100%;">Apply Filters</button>
+                <button class="btn btn-secondary" id="apply-filters" style="width: 100%;">Apply Filters</button>
             </div>
         </aside>
 
         <!-- Product Grid -->
         <section>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <h2 style="font-size: 1.75rem;">All Products</h2>
-                <select class="form-control" style="width: auto;">
-                    <option>Sort by: Featured</option>
-                    <option>Price: Low to High</option>
-                    <option>Price: High to Low</option>
-                    <option>Newest First</option>
-                </select>
+                <h2 style="font-size: 1.75rem;">Premium Collection</h2>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <span id="results-count" style="color: var(--gray-500); font-size: 0.9rem;">Showing all products</span>
+                    <select id="sort-select" class="form-control" style="width: auto;">
+                        <option value="featured">Featured</option>
+                        <option value="low">Price: Low to High</option>
+                        <option value="high">Price: High to Low</option>
+                    </select>
+                </div>
             </div>
 
-            <div id="product-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 2rem;">
-                <!-- Product placeholders (will be dynamic) -->
-                <div class="card product-card">
-                    <div style="background-color: var(--gray-100); height: 200px; border-radius: 4px; margin-bottom: 1rem; position: relative; overflow: hidden;">
-                        <img src="https://via.placeholder.com/240x200?text=Premium+Watch" style="width: 100%; height: 100%; object-fit: cover;">
-                        <span class="badge badge-new" style="position: absolute; top: 10px; right: 10px;">New</span>
-                    </div>
-                    <p style="color: var(--gray-500); font-size: 0.8rem;">Accessories</p>
-                    <h3 style="font-size: 1.1rem; margin: 0.5rem 0;">Elegant Chronograph</h3>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-weight: 700; font-size: 1.2rem;">$199.99</span>
-                        <button class="btn btn-primary" style="padding: 0.4rem 0.8rem;"><i class="fas fa-plus"></i></button>
-                    </div>
-                </div>
-
-                <!-- More placeholders... -->
-                <div class="card product-card">
-                    <div style="background-color: var(--gray-100); height: 200px; border-radius: 4px; margin-bottom: 1rem;">
-                        <img src="https://via.placeholder.com/240x200?text=Smartphone" style="width: 100%; height: 100%; object-fit: cover;">
-                    </div>
-                    <p style="color: var(--gray-500); font-size: 0.8rem;">Electronics</p>
-                    <h3 style="font-size: 1.1rem; margin: 0.5rem 0;">Smart Pro X2</h3>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-weight: 700; font-size: 1.2rem;">$899.00</span>
-                        <button class="btn btn-primary" style="padding: 0.4rem 0.8rem;"><i class="fas fa-plus"></i></button>
-                    </div>
-                </div>
+            <div id="product-grid" class="product-grid animate-fade-in">
+                <!-- Products will be loaded here -->
             </div>
         </section>
     </main>
@@ -105,10 +79,125 @@
     <script type="module">
         import api from './js/api.js';
         
-        if (localStorage.getItem('token')) {
-            document.getElementById('auth-link').style.display = 'none';
-            document.getElementById('user-menu').style.display = 'block';
+        let allProducts = [];
+        let categories = [];
+        let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+
+        async function init() {
+            try {
+                // Auth check
+                if (localStorage.getItem('token')) {
+                    document.getElementById('auth-link').style.display = 'none';
+                    document.getElementById('user-menu').style.display = 'block';
+                }
+
+                // Load Categories
+                const cats = await api.getCategories();
+                const catList = document.getElementById('category-list');
+                catList.innerHTML = cats.map(c => `
+                    <li><input type="checkbox" class="cat-check" id="cat-${c.id}" value="${c.id}"> <label for="cat-${c.id}">${c.name}</label></li>
+                `).join('');
+
+                // Load Products
+                await loadProducts();
+                renderCartCount();
+            } catch (err) {
+                console.error(err);
+            }
         }
+
+        async function loadProducts() {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center;"><i class="fas fa-circle-notch fa-spin"></i></div>';
+            
+            const result = await api.getProducts({ page_size: 100 });
+            allProducts = result.items;
+            renderProducts(allProducts);
+        }
+
+        function renderProducts(products) {
+            const grid = document.getElementById('product-grid');
+            if (products.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 4rem;"><h3>No products found</h3></div>';
+                return;
+            }
+
+            grid.innerHTML = products.map(p => `
+                <div class="product-card card">
+                    <div style="background-color: var(--gray-100); height: 220px; border-radius: 8px; margin-bottom: 1.25rem; position: relative; overflow: hidden;">
+                        <img src="${p.image_url}" style="width: 100%; height: 100%; object-fit: cover;">
+                        <button class="wishlist-btn" onclick="addToWishlist(${p.id})" style="position: absolute; top: 12px; right: 12px; background: white; border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid var(--gray-100);">
+                            <i class="far fa-heart"></i>
+                        </button>
+                    </div>
+                    <p style="color: var(--gray-500); font-size: 0.8rem; text-transform: uppercase;">${p.category ? p.category.name : 'Premium'}</p>
+                    <h3 style="font-size: 1.1rem; margin: 0.5rem 0; height: 2.8rem; overflow: hidden;">${p.name}</h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                        <span style="font-weight: 700; font-size: 1.25rem; color: var(--gray-900);">$${p.price.toFixed(2)}</span>
+                        <button class="btn btn-primary add-to-cart" data-id="${p.id}" style="padding: 0.5rem 1rem;"><i class="fas fa-cart-plus"></i> Add</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Add to cart listeners
+            document.querySelectorAll('.add-to-cart').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const pid = parseInt(e.currentTarget.dataset.id);
+                    const prod = allProducts.find(p => p.id === pid);
+                    addToCart(prod);
+                });
+            });
+        }
+
+        function addToCart(product) {
+            const existing = cart.find(item => item.id === product.id);
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            localStorage.setItem('cart', JSON.stringify(cart));
+            renderCartCount();
+            
+            // Animation/Feedback
+            alert(`Added ${product.name} to cart!`);
+        }
+
+        function renderCartCount() {
+            const count = cart.reduce((acc, item) => acc + item.quantity, 0);
+            const badge = document.getElementById('cart-count');
+            if (count > 0) {
+                badge.textContent = count;
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        window.addToWishlist = async (productId) => {
+            if (!localStorage.getItem('token')) {
+                window.location.href = 'auth.html';
+                return;
+            }
+            try {
+                await api.addToWishlist(productId);
+                alert('Added to wishlist!');
+            } catch (err) {
+                alert(err.message);
+            }
+        };
+
+        // Search
+        document.getElementById('product-search').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = allProducts.filter(p => 
+                p.name.toLowerCase().includes(term) || 
+                p.description.toLowerCase().includes(term)
+            );
+            renderProducts(filtered);
+        });
+
+        init();
     </script>
 </body>
 </html>

@@ -13,7 +13,7 @@ from app.core.constants import UserRole
 
 async def create_admin():
     """Create a default admin user based on environment variables."""
-    print(f"🛠️ Starting admin creation process...")
+    print(f"[*] Starting admin creation process...")
     
     async with AsyncSessionLocal() as session:
         # Check if admin already exists
@@ -22,7 +22,7 @@ async def create_admin():
         admin = result.scalar_one_or_none()
         
         if admin:
-            print(f"⚠️ Admin user with email {settings.ADMIN_EMAIL} already exists.")
+            print(f"[!] Admin user with email {settings.ADMIN_EMAIL} already exists.")
             return
 
         # Create new admin user
@@ -37,7 +37,7 @@ async def create_admin():
         
         session.add(new_admin)
         await session.commit()
-        print(f"✅ Admin user {settings.ADMIN_EMAIL} created successfully!")
+        print(f"[+] Admin user {settings.ADMIN_EMAIL} created successfully!")
 
 if __name__ == "__main__":
     asyncio.run(create_admin())

@@ -1,145 +1,201 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login & Register | PremiumStore</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login & Register — PremiumStore</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .auth-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 1rem;
+      background: linear-gradient(135deg, #f8fafc 0%, #e0f7fa 100%);
+    }
+    .auth-card {
+      background: white;
+      border-radius: 24px;
+      padding: 3rem;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 24px 60px -12px rgba(14,181,200,.18);
+    }
+    .auth-tabs {
+      display: flex;
+      gap: 0;
+      background: var(--bg);
+      border-radius: 10px;
+      padding: .3rem;
+      margin-bottom: 2rem;
+    }
+    .auth-tab {
+      flex: 1;
+      text-align: center;
+      padding: .65rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: .9rem;
+      cursor: pointer;
+      transition: all .25s;
+      color: var(--text-mute);
+      background: none;
+      border: none;
+      font-family: inherit;
+    }
+    .auth-tab.active { background: white; color: var(--cyan); box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+    .error-box { background: #fef2f2; color: #dc2626; border-radius: 10px; padding: .9rem 1.1rem; font-size: .88rem; margin-bottom: 1rem; display: none; }
+    .success-msg { background: #f0fdf4; color: #16a34a; border-radius: 10px; padding: .9rem 1.1rem; font-size: .88rem; margin-bottom: 1rem; display: none; }
+  </style>
 </head>
-<body style="display: flex; flex-direction: column; min-height: 100vh;">
-    <header>
-        <div class="container nav-container">
-            <a href="index.html" class="logo">
-                <i class="fas fa-shopping-bag"></i> PremiumStore
-            </a>
+<body>
+<header class="site-header">
+  <div class="container nav-inner">
+    <a href="index.html" class="logo"><i class="fas fa-bolt"></i> PremiumStore</a>
+  </div>
+</header>
+
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div style="text-align:center;margin-bottom:2rem;">
+      <div class="logo" style="justify-content:center;margin-bottom:.5rem;"><i class="fas fa-bolt"></i> PremiumStore</div>
+      <p style="color:var(--text-mute);font-size:.9rem;">Your premium shopping destination</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login"    onclick="showTab('login')">Sign In</button>
+      <button class="auth-tab"        id="tab-register" onclick="showTab('register')">Create Account</button>
+    </div>
+
+    <div class="error-box"   id="err-msg"></div>
+    <div class="success-msg" id="ok-msg"></div>
+
+    <!-- Login Form -->
+    <form id="login-form" onsubmit="doLogin(event)">
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input id="l-email" class="form-control" type="email" required placeholder="you@example.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input id="l-pass" class="form-control" type="password" required placeholder="••••••••" minlength="6">
+      </div>
+      <button type="submit" class="btn btn-primary" id="login-btn"
+        style="width:100%;justify-content:center;margin-top:.5rem;padding:1rem;font-size:1rem;">
+        Sign In <i class="fas fa-arrow-right"></i>
+      </button>
+    </form>
+
+    <!-- Register Form (hidden) -->
+    <form id="register-form" style="display:none;" onsubmit="doRegister(event)">
+      <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div class="form-group">
+          <label class="form-label">First Name</label>
+          <input id="r-first" class="form-control" type="text" required placeholder="John">
         </div>
-    </header>
-
-    <main style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem;">
-        <div class="card animate-fade-in" style="width: 100%; max-width: 450px; padding: 2.5rem;">
-            <div style="text-align: center; margin-bottom: 2rem;">
-                <h2 id="form-title" style="font-size: 1.75rem;">Sign In</h2>
-                <p id="form-subtitle" style="color: var(--gray-500); margin-top: 0.5rem;">Welcome back to PremiumStore</p>
-            </div>
-
-            <!-- Login Form -->
-            <form id="login-form">
-                <div class="form-group">
-                    <label class="form-label">Email Address</label>
-                    <input type="email" id="login-email" class="form-control" placeholder="name@example.com" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Password</label>
-                    <input type="password" id="login-password" class="form-control" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Sign In</button>
-            </form>
-
-            <!-- Register Form (Hidden) -->
-            <form id="register-form" style="display: none;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                    <div class="form-group">
-                        <label class="form-label">First Name</label>
-                        <input type="text" id="reg-firstname" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Last Name</label>
-                        <input type="text" id="reg-lastname" class="form-control" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Email Address</label>
-                    <input type="email" id="reg-email" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Password</label>
-                    <input type="password" id="reg-password" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Confirm Password</label>
-                    <input type="password" id="reg-confirm" class="form-control" required>
-                </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Create Account</button>
-            </form>
-
-            <div style="text-align: center; margin-top: 2rem; border-top: 1px solid var(--gray-200); padding-top: 1.5rem;">
-                <p id="toggle-text">New to PremiumStore? <a href="#" id="toggle-form" style="color: var(--accent); text-decoration: none; font-weight: 600;">Create an account</a></p>
-            </div>
-            
-            <div id="error-message" style="display: none; margin-top: 1.5rem; padding: 1rem; background-color: #fee2e2; color: #dc2626; border-radius: 6px; font-size: 0.875rem; text-align: center;">
-            </div>
+        <div class="form-group">
+          <label class="form-label">Last Name</label>
+          <input id="r-last" class="form-control" type="text" required placeholder="Doe">
         </div>
-    </main>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input id="r-email" class="form-control" type="email" required placeholder="you@example.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input id="r-pass" class="form-control" type="password" required placeholder="Min. 8 characters" minlength="8">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirm Password</label>
+        <input id="r-confirm" class="form-control" type="password" required placeholder="Repeat password" minlength="8">
+      </div>
+      <button type="submit" class="btn btn-primary" id="reg-btn"
+        style="width:100%;justify-content:center;margin-top:.5rem;padding:1rem;font-size:1rem;">
+        Create Account <i class="fas fa-user-plus"></i>
+      </button>
+    </form>
 
-    <script type="module">
-        import api from './js/api.js';
+    <p style="text-align:center;font-size:.8rem;color:var(--text-mute);margin-top:1.5rem;">
+      <i class="fas fa-lock"></i> Your data is safe with 256-bit SSL encryption.
+    </p>
+  </div>
+</div>
 
-        const loginForm = document.getElementById('login-form');
-        const registerForm = document.getElementById('register-form');
-        const toggleFormBtn = document.getElementById('toggle-form');
-        const formTitle = document.getElementById('form-title');
-        const formSubtitle = document.getElementById('form-subtitle');
-        const toggleText = document.getElementById('toggle-text');
-        const errorDiv = document.getElementById('error-message');
+<script>
+// Tab toggle
+function showTab(tab) {
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+  document.getElementById('login-form').style.display    = tab === 'login'    ? 'block' : 'none';
+  document.getElementById('register-form').style.display = tab === 'register' ? 'block' : 'none';
+  clearMsg();
+}
+function showErr(msg)  { const e = document.getElementById('err-msg');  e.textContent = msg; e.style.display = 'block'; }
+function showOk(msg)   { const e = document.getElementById('ok-msg');   e.textContent = msg; e.style.display = 'block'; }
+function clearMsg()    { document.getElementById('err-msg').style.display = 'none'; document.getElementById('ok-msg').style.display = 'none'; }
 
-        let isLogin = true;
+async function doLogin(e) {
+  e.preventDefault(); clearMsg();
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
 
-        toggleFormBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            isLogin = !isLogin;
-            loginForm.style.display = isLogin ? 'block' : 'none';
-            registerForm.style.display = isLogin ? 'none' : 'block';
-            formTitle.textContent = isLogin ? 'Sign In' : 'Create Account';
-            formSubtitle.textContent = isLogin ? 'Welcome back to PremiumStore' : 'Start your shopping journey today';
-            toggleText.innerHTML = isLogin ? 
-                'New to PremiumStore? <a href="#" id="toggle-form" style="color: var(--accent); text-decoration: none; font-weight: 600;">Create an account</a>' :
-                'Already have an account? <a href="#" id="toggle-form" style="color: var(--accent); text-decoration: none; font-weight: 600;">Sign in instead</a>';
-            
-            // Re-attach listener to new dynamic link
-            document.getElementById('toggle-form').addEventListener('click', (e) => {
-                e.preventDefault();
-                toggleFormBtn.click();
-            });
-            errorDiv.style.display = 'none';
-        });
+  try {
+    const res = await fetch('http://localhost:8000/api/v1/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email:    document.getElementById('l-email').value,
+        password: document.getElementById('l-pass').value
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Login failed');
 
-        const showError = (msg) => {
-            errorDiv.textContent = msg;
-            errorDiv.style.display = 'block';
-        };
+    localStorage.setItem('token', data.tokens?.access_token || data.access_token);
+    localStorage.setItem('user',  JSON.stringify(data.user || {}));
+    window.location.href = 'index.html';
+  } catch (err) {
+    showErr(err.message);
+    btn.disabled = false; btn.innerHTML = 'Sign In <i class="fas fa-arrow-right"></i>';
+  }
+}
 
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            errorDiv.style.display = 'none';
-            try {
-                const email = document.getElementById('login-email').value;
-                const pass = document.getElementById('login-password').value;
-                await api.login(email, pass);
-                window.location.href = 'index.html';
-            } catch (err) {
-                showError(err.message);
-            }
-        });
+async function doRegister(e) {
+  e.preventDefault(); clearMsg();
+  const pass = document.getElementById('r-pass').value;
+  const conf = document.getElementById('r-confirm').value;
+  if (pass !== conf) { showErr('Passwords do not match.'); return; }
 
-        registerForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            errorDiv.style.display = 'none';
-            try {
-                const userData = {
-                    email: document.getElementById('reg-email').value,
-                    password: document.getElementById('reg-password').value,
-                    confirm_password: document.getElementById('reg-confirm').value,
-                    first_name: document.getElementById('reg-firstname').value,
-                    last_name: document.getElementById('reg-lastname').value
-                };
-                await api.register(userData);
-                alert('Registration successful! Please sign in.');
-                toggleFormBtn.click();
-            } catch (err) {
-                showError(err.message);
-            }
-        });
-    </script>
+  const btn = document.getElementById('reg-btn');
+  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
+
+  try {
+    const res = await fetch('http://localhost:8000/api/v1/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email:            document.getElementById('r-email').value,
+        password:         pass,
+        confirm_password: conf,
+        first_name:       document.getElementById('r-first').value,
+        last_name:        document.getElementById('r-last').value
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Registration failed');
+
+    showOk('Account created! You can now sign in.');
+    showTab('login');
+  } catch (err) {
+    showErr(err.message);
+  } finally {
+    btn.disabled = false; btn.innerHTML = 'Create Account <i class="fas fa-user-plus"></i>';
+  }
+}
+</script>
 </body>
 </html>

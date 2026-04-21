@@ -1,103 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Store | Your Ultimate E-Commerce Experience</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PremiumStore — Modern Shopping Discovery</title>
+  <meta name="description" content="Shop the finest electronics, fashion, furniture, home goods and watches at PremiumStore. Discover curated collections with fast delivery.">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <header>
-        <div class="container nav-container">
-            <a href="index.html" class="logo">
-                <i class="fas fa-shopping-bag"></i> PremiumStore
-            </a>
-            
-            <div class="search-bar">
-                <input type="text" placeholder="Search for products, brands and more...">
-            </div>
 
-            <nav class="nav-actions">
-                <a href="auth.html" class="nav-link" id="auth-link">Login</a>
-                <a href="cart.html" class="nav-link"><i class="fas fa-shopping-cart"></i> Cart</a>
-                <div id="user-menu" style="display: none;">
-                    <a href="profile.html" class="nav-link"><i class="fas fa-user-circle"></i> Profile</a>
-                </div>
-            </nav>
-        </div>
-    </header>
+<!-- ── HEADER ─────────────────────────────────────────────────────── -->
+<header class="site-header">
+  <div class="container nav-inner">
+    <a href="index.html" class="logo"><i class="fas fa-bolt"></i> PremiumStore</a>
+    <nav class="nav-links">
+      <a href="index.html" class="active">Home</a>
+      <a href="category.html">Categories</a>
+      <a href="auth.html"><i class="fas fa-user"></i></a>
+      <a href="cart.html" class="nav-cart">
+        <i class="fas fa-shopping-bag"></i>
+        <span class="cart-badge">0</span>
+      </a>
+    </nav>
+  </div>
+</header>
 
-    <main>
-        <!-- Hero Section -->
-        <section class="hero" style="background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') center/cover; height: 400px; display: flex; align-items: center; color: white;">
-            <div class="container animate-fade-in">
-                <h1 style="font-size: 3.5rem; margin-bottom: 1rem;">Premium Experience.</h1>
-                <p style="font-size: 1.25rem; margin-bottom: 2rem; max-width: 600px;">Discover the finest collection of products curated just for you. Quality meets elegance.</p>
-                <a href="products.html" class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1rem;">Shop Collection</a>
-            </div>
-        </section>
+<!-- ── HERO ───────────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="container hero-content">
+    <h1>Discover Products<br><span>You'll Actually Love</span></h1>
+    <p>Curated electronics, fashion, furniture, home living, and luxury watches — all in one beautifully designed store.</p>
+    <a href="category.html" class="btn btn-ghost">Browse All Categories <i class="fas fa-arrow-right"></i></a>
+  </div>
+</section>
 
-        <!-- Featured Categories -->
-        <section class="container" style="padding: 4rem 1.5rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem;">
-                <h2 style="font-size: 2rem;">Shop by Category</h2>
-                <a href="products.html" style="color: var(--accent); text-decoration: none; font-weight: 600;">View All <i class="fas fa-arrow-right"></i></a>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem;">
-                <div class="card" style="text-align: center; cursor: pointer;">
-                    <i class="fas fa-laptop" style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;"></i>
-                    <h3>Electronics</h3>
-                    <p style="color: var(--gray-500); margin-top: 0.5rem;">The latest gadgets and tech.</p>
-                </div>
-                <div class="card" style="text-align: center; cursor: pointer;">
-                    <i class="fas fa-tshirt" style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;"></i>
-                    <h3>Fashion</h3>
-                    <p style="color: var(--gray-500); margin-top: 0.5rem;">Modern trends for everyone.</p>
-                </div>
-                <div class="card" style="text-align: center; cursor: pointer;">
-                    <i class="fas fa-couch" style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;"></i>
-                    <h3>Home & Living</h3>
-                    <p style="color: var(--gray-500); margin-top: 0.5rem;">Elevate your space.</p>
-                </div>
-            </div>
-        </section>
-    </main>
+<!-- ── MAIN CONTENT ───────────────────────────────────────────────── -->
+<main class="container">
 
-    <footer style="background-color: var(--gray-900); color: var(--white); padding: 4rem 0; margin-top: 4rem;">
-        <div class="container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 3rem;">
-            <div>
-                <h4 style="margin-bottom: 1.5rem;">PremiumStore</h4>
-                <p style="color: var(--gray-400); font-size: 0.9rem;">The world's leading e-commerce platform for high-quality goods.</p>
-            </div>
-            <div>
-                <h4 style="margin-bottom: 1.5rem;">Quick Links</h4>
-                <ul style="list-style: none; color: var(--gray-400); font-size: 0.9rem; line-height: 2;">
-                    <li><a href="#" style="color: inherit; text-decoration: none;">Help Center</a></li>
-                    <li><a href="#" style="color: inherit; text-decoration: none;">Returns & Refunds</a></li>
-                    <li><a href="#" style="color: inherit; text-decoration: none;">Shipping Info</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 style="margin-bottom: 1.5rem;">Newsletter</h4>
-                <p style="color: var(--gray-400); font-size: 0.9rem; margin-bottom: 1rem;">Subscribe to receive updates and exclusive offers.</p>
-                <div style="display: flex;">
-                    <input type="email" placeholder="Email address" style="padding: 0.6rem; border: none; border-radius: 4px 0 0 4px; flex: 1;">
-                    <button class="btn btn-primary" style="border-radius: 0 4px 4px 0;">Join</button>
-                </div>
-            </div>
-        </div>
-    </footer>
+  <!-- Trending Now -->
+  <section class="section">
+    <div class="section-head">
+      <h2 class="section-title">Trending Now</h2>
+      <a href="category.html" class="view-all">View All →</a>
+    </div>
+    <div id="trending-grid" class="product-grid"></div>
+  </section>
 
-    <script type="module">
-        import api from './js/api.js';
-        
-        // Simple auth check
-        if (localStorage.getItem('token')) {
-            document.getElementById('auth-link').style.display = 'none';
-            document.getElementById('user-menu').style.display = 'block';
-        }
-    </script>
+  <!-- Category Spotlight -->
+  <section class="section">
+    <div class="section-head">
+      <h2 class="section-title">Shop by Category</h2>
+    </div>
+    <div class="category-grid">
+      <a href="category.html?cat=Electronics" class="category-card"><i class="fas fa-laptop"></i><span>Electronics</span></a>
+      <a href="category.html?cat=Fashion"     class="category-card"><i class="fas fa-shirt"></i><span>Fashion</span></a>
+      <a href="category.html?cat=Furniture"   class="category-card"><i class="fas fa-chair"></i><span>Furniture</span></a>
+      <a href="category.html?cat=Home+%26+Living" class="category-card"><i class="fas fa-house"></i><span>Home & Living</span></a>
+      <a href="category.html?cat=Watches"     class="category-card"><i class="fas fa-clock"></i><span>Watches</span></a>
+    </div>
+  </section>
+
+  <!-- Best Deals -->
+  <div class="banner-strip">
+    <div>
+      <h2>🎉 Best Deals of the Season</h2>
+      <p>Hand-picked savings across all categories. Limited stock — grab yours before it's gone.</p>
+    </div>
+    <a href="category.html" class="btn btn-outline" style="color:#fff;border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.12);">Shop Deals <i class="fas fa-tag"></i></a>
+  </div>
+
+  <!-- Featured Products -->
+  <section class="section">
+    <div class="section-head">
+      <h2 class="section-title">Featured Products</h2>
+      <a href="category.html" class="view-all">View All →</a>
+    </div>
+    <div id="featured-grid" class="product-grid"></div>
+  </section>
+
+  <!-- Fresh Picks -->
+  <section class="section">
+    <div class="section-head">
+      <h2 class="section-title">Fresh Picks</h2>
+    </div>
+    <div id="picks-grid" class="product-grid"></div>
+  </section>
+
+</main>
+
+<!-- ── FOOTER ─────────────────────────────────────────────────────── -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo"><i class="fas fa-bolt"></i> PremiumStore</div>
+        <p>The future of youthful shopping. Modern aesthetics meet premium commerce. Free returns on every order.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Customer Care</h4>
+        <ul>
+          <li>Shipping Policy</li>
+          <li>Returns & Refunds</li>
+          <li>Track My Order</li>
+          <li>Contact Support</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li>About Us</li>
+          <li>Careers</li>
+          <li>Press</li>
+          <li>Partners</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Follow Us</h4>
+        <ul>
+          <li><i class="fab fa-instagram"></i> Instagram</li>
+          <li><i class="fab fa-tiktok"></i> TikTok</li>
+          <li><i class="fab fa-twitter"></i> Twitter / X</li>
+          <li><i class="fab fa-youtube"></i> YouTube</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">© 2025 PremiumStore. All rights reserved.</div>
+  </div>
+</footer>
+
+<script type="module">
+import productsData from './js/products-data.js';
+import { cart } from './js/cart-system.js';
+
+// Shuffle helper — no repeats across sections
+function shuffled(arr) { return [...arr].sort(() => Math.random() - .5); }
+
+// Build a product card HTML
+function cardHtml(p) {
+  return `
+  <div class="product-card fade-up" data-id="${p.id}">
+    <a href="details.html?id=${p.id}" class="product-card__img">
+      <img
+        src="${p.image}"
+        alt="${p.name}"
+        loading="lazy"
+        onerror="this.src='https://placehold.co/400x400/e0f7fa/0eb5c8?text=${encodeURIComponent(p.name.slice(0,16))}'">
+    </a>
+    <div class="product-card__body">
+      <div class="product-card__cat">${p.category}</div>
+      <div class="product-card__name">${p.name}</div>
+      <div class="product-card__footer">
+        <div class="product-card__price">$${p.price.toFixed(2)}</div>
+        <button class="add-btn" title="Add to cart" data-id="${p.id}">
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderGrid(id, items) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = items.map(cardHtml).join('');
+  el.querySelectorAll('.add-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const p = productsData.find(x => x.id === +btn.dataset.id);
+      if (p) {
+        cart.add(p);
+        btn.classList.add('added');
+        btn.innerHTML = '<i class="fas fa-check"></i>';
+        setTimeout(() => { btn.classList.remove('added'); btn.innerHTML = '<i class="fas fa-plus"></i>'; }, 1200);
+      }
+    });
+  });
+}
+
+// Three non-overlapping slices
+const all     = shuffled(productsData);
+const trending = all.slice(0, 10);
+const featured = all.slice(10, 20);
+const picks    = all.slice(20, 30);
+
+renderGrid('trending-grid', trending);
+renderGrid('featured-grid', featured);
+renderGrid('picks-grid',    picks);
+
+cart._badge();
+</script>
 </body>
 </html>

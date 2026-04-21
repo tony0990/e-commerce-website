@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="page-title">Product — PremiumStore</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav-inner">
+    <a href="index.html" class="logo"><i class="fas fa-bolt"></i> PremiumStore</a>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="category.html">Categories</a>
+      <a href="auth.html"><i class="fas fa-user"></i></a>
+      <a href="cart.html" class="nav-cart">
+        <i class="fas fa-shopping-bag"></i>
+        <span class="cart-badge">0</span>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb" id="breadcrumb" style="margin-top:2rem;">
+    <a href="index.html">Home</a> <i class="fas fa-chevron-right" style="font-size:.6rem;opacity:.5"></i>
+    <a href="category.html">Categories</a> <i class="fas fa-chevron-right" style="font-size:.6rem;opacity:.5"></i>
+    <span id="bc-cat">…</span> <i class="fas fa-chevron-right" style="font-size:.6rem;opacity:.5"></i>
+    <span id="bc-name">…</span>
+  </nav>
+
+  <!-- Loading state -->
+  <div id="loading" style="text-align:center;padding:8rem 0;">
+    <i class="fas fa-circle-notch fa-spin" style="font-size:2rem;color:var(--cyan)"></i>
+  </div>
+
+  <!-- Details layout (hidden until loaded) -->
+  <div class="details-grid" id="details-layout" style="display:none;">
+    <!-- Gallery -->
+    <div class="details-gallery">
+      <img id="main-img" src="" alt="">
+    </div>
+
+    <!-- Info -->
+    <div class="details-info fade-up">
+      <div class="details-cat" id="d-cat"></div>
+      <h1 class="details-name" id="d-name"></h1>
+      <div class="details-rating">
+        <span class="stars">★★★★★</span>
+        <span id="d-rating"></span>
+        <span>·</span>
+        <span id="d-reviews"></span> reviews
+      </div>
+      <div class="details-price" id="d-price"></div>
+      <p class="details-desc" id="d-desc"></p>
+
+      <!-- Quantity -->
+      <div class="qty-row">
+        <label style="font-size:.85rem;font-weight:700;color:var(--slate-mid)">Quantity</label>
+        <div class="qty-box">
+          <button id="qty-minus"><i class="fas fa-minus"></i></button>
+          <span id="qty-val">1</span>
+          <button id="qty-plus"><i class="fas fa-plus"></i></button>
+        </div>
+      </div>
+
+      <div class="details-actions">
+        <button id="add-cart-btn" class="btn btn-primary" style="font-size:1rem;">
+          <i class="fas fa-shopping-bag"></i> Add to Cart
+        </button>
+        <a href="cart.html" class="btn btn-outline">
+          <i class="fas fa-bag-shopping"></i> View Cart
+        </a>
+      </div>
+
+      <div class="perks">
+        <div class="perk"><i class="fas fa-truck"></i> Fast Shipping Worldwide</div>
+        <div class="perk"><i class="fas fa-shield-halved"></i> Secure & Private Checkout</div>
+        <div class="perk"><i class="fas fa-rotate-left"></i> 30-Day Free Returns</div>
+        <div class="perk"><i class="fas fa-medal"></i> Authentic Guarantee</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Related Products -->
+  <section class="section" id="related-section" style="display:none;">
+    <div class="section-head">
+      <h2 class="section-title">You May Also Like</h2>
+    </div>
+    <div id="related-grid" class="product-grid"></div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-bottom">© 2025 PremiumStore. All rights reserved.</div>
+  </div>
+</footer>
+
+<script type="module">
+import productsData from './js/products-data.js';
+import { cart } from './js/cart-system.js';
+
+const id = parseInt(new URLSearchParams(location.search).get('id'));
+const product = productsData.find(p => p.id === id);
+
+if (!product) {
+  document.getElementById('loading').innerHTML = `
+    <div class="empty-state">
+      <i class="fas fa-magnifying-glass"></i>
+      <h2>Product not found</h2>
+      <p>This product may no longer be available.</p>
+      <a href="index.html" class="btn btn-primary">Return Home</a>
+    </div>`;
+} else {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('details-layout').style.display = 'grid';
+  document.getElementById('related-section').style.display = 'block';
+
+  document.title = `${product.name} — PremiumStore`;
+  document.getElementById('bc-cat').textContent  = product.category;
+  document.getElementById('bc-name').textContent = product.name.slice(0,30) + (product.name.length > 30 ? '…' : '');
+
+  // Gallery image
+  const img = document.getElementById('main-img');
+  img.src = product.image;
+  img.alt = product.name;
+  img.onerror = () => {
+    img.src = `https://placehold.co/600x600/e0f7fa/0eb5c8?text=${encodeURIComponent(product.name.slice(0,20))}`;
+  };
+
+  // Text
+  document.getElementById('d-cat').textContent     = product.category;
+  document.getElementById('d-name').textContent    = product.name;
+  document.getElementById('d-rating').textContent  = product.rating;
+  document.getElementById('d-reviews').textContent = product.reviews;
+  document.getElementById('d-price').textContent   = `$${product.price.toFixed(2)}`;
+  document.getElementById('d-desc').textContent    = product.description;
+
+  // Quantity
+  let qty = 1;
+  const qtyEl = document.getElementById('qty-val');
+  document.getElementById('qty-minus').addEventListener('click', () => { if (qty > 1) { qty--; qtyEl.textContent = qty; } });
+  document.getElementById('qty-plus').addEventListener('click',  () => { qty++; qtyEl.textContent = qty; });
+
+  // Add to cart
+  const addBtn = document.getElementById('add-cart-btn');
+  addBtn.addEventListener('click', () => {
+    cart.add(product, qty);
+    addBtn.innerHTML = '<i class="fas fa-check"></i> Added!';
+    addBtn.style.background = '#22c55e';
+    setTimeout(() => { addBtn.innerHTML = '<i class="fas fa-shopping-bag"></i> Add to Cart'; addBtn.style.background = ''; }, 1500);
+  });
+
+  // Related products — same category, excluding current
+  const related = productsData
+    .filter(p => p.category === product.category && p.id !== product.id)
+    .sort(() => Math.random() - .5)
+    .slice(0, 4);
+
+  const relGrid = document.getElementById('related-grid');
+  relGrid.innerHTML = related.map(p => `
+    <div class="product-card">
+      <a href="details.html?id=${p.id}" class="product-card__img">
+        <img src="${p.image}" alt="${p.name}" loading="lazy"
+          onerror="this.src='https://placehold.co/400x400/e0f7fa/0eb5c8?text=${encodeURIComponent(p.name.slice(0,16))}'">
+      </a>
+      <div class="product-card__body">
+        <div class="product-card__cat">${p.category}</div>
+        <div class="product-card__name">${p.name}</div>
+        <div class="product-card__footer">
+          <div class="product-card__price">$${p.price.toFixed(2)}</div>
+          <button class="add-btn" data-id="${p.id}"><i class="fas fa-plus"></i></button>
+        </div>
+      </div>
+    </div>`).join('');
+
+  relGrid.querySelectorAll('.add-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const rp = productsData.find(x => x.id === +btn.dataset.id);
+      if (rp) { cart.add(rp); btn.innerHTML = '<i class="fas fa-check"></i>'; btn.classList.add('added'); setTimeout(() => { btn.innerHTML = '<i class="fas fa-plus"></i>'; btn.classList.remove('added'); }, 1200); }
+    });
+  });
+}
+
+cart._badge();
+</script>
+</body>
+</html>

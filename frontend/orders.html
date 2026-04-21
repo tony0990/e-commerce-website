@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders | PremiumStore</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body style="background-color: var(--gray-50);">
+    <header>
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-shopping-bag"></i> PremiumStore
+            </a>
+            <nav class="nav-actions">
+                <a href="products.html" class="nav-link">Shop</a>
+                <a href="profile.html" class="nav-link">Profile</a>
+                <button id="logout-btn" class="btn btn-secondary" style="padding: 0.4rem 0.8rem;">Logout</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container" style="padding: 4rem 1.5rem;">
+        <div style="margin-bottom: 3rem;">
+            <h1 style="font-size: 2.5rem;">My Orders</h1>
+            <p style="color: var(--gray-500); margin-top: 0.5rem;">Manage and track your recent purchases.</p>
+        </div>
+
+        <div id="orders-container" class="animate-fade-in">
+            <!-- Loading state -->
+            <div style="text-align: center; padding: 4rem;">
+                <i class="fas fa-circle-notch fa-spin" style="font-size: 2rem; color: var(--accent);"></i>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import api from './js/api.js';
+
+        async function init() {
+            try {
+                const orders = await api.getMyOrders();
+                const container = document.getElementById('orders-container');
+
+                if (orders.length === 0) {
+                    container.innerHTML = `
+                        <div class="card" style="text-align: center; padding: 4rem;">
+                            <i class="fas fa-box-open" style="font-size: 4rem; color: var(--gray-200); margin-bottom: 1.5rem;"></i>
+                            <h3>No orders yet</h3>
+                            <p style="color: var(--gray-500); margin-top: 0.5rem;">Your shopping journey hasn't started yet.</p>
+                            <a href="products.html" class="btn btn-primary" style="margin-top: 2rem;">Start Shopping</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = orders.map(order => `
+                    <div class="card" style="margin-bottom: 2rem; padding: 0; overflow: hidden;">
+                        <div style="background-color: var(--gray-100); padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gray-200);">
+                            <div style="display: flex; gap: 3rem;">
+                                <div>
+                                    <p style="font-size: 0.75rem; color: var(--gray-500); text-transform: uppercase; font-weight: 600;">Order Placed</p>
+                                    <p style="font-weight: 500;">${new Date(order.created_at).toLocaleDateString()}</p>
+                                </div>
+                                <div>
+                                    <p style="font-size: 0.75rem; color: var(--gray-500); text-transform: uppercase; font-weight: 600;">Total Amount</p>
+                                    <p style="font-weight: 500; color: var(--accent);">$${order.total_amount.toFixed(2)}</p>
+                                </div>
+                                <div>
+                                    <p style="font-size: 0.75rem; color: var(--gray-500); text-transform: uppercase; font-weight: 600;">Payment</p>
+                                    <p style="font-weight: 500;">${order.payment_method}</p>
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <p style="font-size: 0.75rem; color: var(--gray-500); text-transform: uppercase; font-weight: 600;">Order #${order.id}</p>
+                                <span class="badge" style="background-color: ${getStatusColor(order.status)}; color: white; margin-top: 0.5rem;">
+                                    ${order.status.toUpperCase()}
+                                </span>
+                            </div>
+                        </div>
+                        <div style="padding: 1.5rem;">
+                            ${order.items.map(item => `
+                                <div style="display: flex; align-items: center; gap: 1.5rem; padding: 1rem 0; border-bottom: 1px solid var(--gray-100);">
+                                    <img src="${item.product.image_url}" alt="${item.product.name}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+                                    <div style="flex: 1;">
+                                        <h4 style="font-size: 1rem;">${item.product.name}</h4>
+                                        <p style="font-size: 0.875rem; color: var(--gray-500); margin-top: 0.25rem;">Quantity: ${item.quantity}</p>
+                                    </div>
+                                    <p style="font-weight: 600;">$${item.total_price.toFixed(2)}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function getStatusColor(status) {
+            switch(status) {
+                case 'pending': return 'var(--warning)';
+                case 'confirmed': return 'var(--info)';
+                case 'delivered': return 'var(--success)';
+                case 'cancelled': return 'var(--error)';
+                default: return 'var(--gray-500)';
+            }
+        }
+
+        document.getElementById('logout-btn').addEventListener('click', () => api.logout());
+        init();
+    </script>
+</body>
+</html>

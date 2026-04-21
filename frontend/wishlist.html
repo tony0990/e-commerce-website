@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Wishlist | PremiumStore</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body style="background-color: var(--gray-50);">
+    <header>
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-shopping-bag"></i> PremiumStore
+            </a>
+            <nav class="nav-actions">
+                <a href="products.html" class="nav-link">Shop</a>
+                <a href="profile.html" class="nav-link">Profile</a>
+                <button id="logout-btn" class="btn btn-secondary" style="padding: 0.4rem 0.8rem;">Logout</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container" style="padding: 4rem 1.5rem;">
+        <div style="margin-bottom: 3rem; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 style="font-size: 2.5rem;">My Wishlist</h1>
+                <p style="color: var(--gray-500); margin-top: 0.5rem;">Items you've saved for later.</p>
+            </div>
+            <button id="clear-wishlist" class="btn btn-secondary" style="border: 1px solid var(--gray-300);">Clear All</button>
+        </div>
+
+        <div id="wishlist-grid" class="product-grid animate-fade-in">
+            <!-- Loading state -->
+            <div style="grid-column: 1/-1; text-align: center; padding: 4rem;">
+                <i class="fas fa-circle-notch fa-spin" style="font-size: 2rem; color: var(--accent);"></i>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import api from './js/api.js';
+
+        async function init() {
+            try {
+                const wishlist = await api.getWishlist();
+                const grid = document.getElementById('wishlist-grid');
+
+                if (wishlist.length === 0) {
+                    grid.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 4rem;">
+                            <i class="fas fa-heart" style="font-size: 4rem; color: var(--gray-200); margin-bottom: 1.5rem;"></i>
+                            <h3>Your wishlist is empty</h3>
+                            <p style="color: var(--gray-500); margin-top: 0.5rem;">Save items you love and they'll appear here.</p>
+                            <a href="products.html" class="btn btn-primary" style="margin-top: 2rem;">Explore Products</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                grid.innerHTML = wishlist.map(item => `
+                    <div class="product-card" id="wish-item-${item.product_id}">
+                        <img src="${item.product.image_url}" alt="${item.product.name}" class="product-image">
+                        <div class="product-info">
+                            <h3>${item.product.name}</h3>
+                            <p class="product-price">$${item.product.price.toFixed(2)}</p>
+                            <div style="display: flex; gap: 0.5rem; margin-top: 1.5rem;">
+                                <button class="btn btn-primary" style="flex: 1;">Add to Cart</button>
+                                <button class="btn btn-secondary remove-btn" data-id="${item.product_id}" style="padding: 0.6rem; background: var(--gray-100); color: var(--error);">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Attach remove listeners
+                document.querySelectorAll('.remove-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const pid = e.currentTarget.dataset.id;
+                        await api.removeFromWishlist(pid);
+                        document.getElementById(`wish-item-${pid}`).remove();
+                        if (document.querySelectorAll('.product-card').length === 0) {
+                            init(); // Re-render empty state
+                        }
+                    });
+                });
+
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        document.getElementById('logout-btn').addEventListener('click', () => api.logout());
+        init();
+    </script>
+</body>
+</html>
