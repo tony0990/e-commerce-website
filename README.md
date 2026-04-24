@@ -130,5 +130,48 @@ docker-compose exec api python scripts/create_admin.py
 - **CORS Protection**: Configurable origins to prevent unauthorized cross-site requests.
 - **Safe Environment**: Automated validation of sensitive configurations via Pydantic.
 
+## 📊 Project Status & Team Contributions
+
+### What's Done So Far
+- ✅ **Clean Architecture:** Modular setup for models, schemas, routers, and services.
+- ✅ **Database & Migrations:** SQLAlchemy and Alembic configured and working.
+- ✅ **Advanced Auth & RBAC:** Full JWT token cycles (Access/Refresh), password hashing, and role-based restrictions.
+- ✅ **API Documentation:** Swapped default Swagger UI for premium **Scalar** docs.
+- ✅ **Caching Layer:** Redis Cache-Aside pattern natively implemented for Products/Categories.
+- ✅ **Logging & Monitoring:** `loguru` structured logging running with a dedicated `/dashboard/metrics` Admin endpoint.
+- ✅ **Docker Environment:** Stack is fully containerized and operational via compose.
+- ✅ **Testing Base Setup:** Pytest environment fixed and JWT/Role endpoints covered!
+
+### What's Missing / Next Steps
+- 🔄 **Extensive Testing Suite:** Tests for business logic (Cart, Orders, Products) need to be completed by respective owners.
+- 🔄 **Postman Collection:** Final API collection and cURL examples to be assembled.
+- 🔄 **Frontend Connection:** Connecting the Vanilla JS views with the FastAPI endpoints.
+- 🔄 **Business Logic Polish:** Deep testing on order state transitions and double bookings.
+
+---
+
+### Team Roles & Accomplishments
+
+#### Ahmed Hussien & Tony (Lead Backend, Architecture, Integration, Bonus)
+- Led the backend structure and implemented all **JWT Authentication** (Login, Register, Hashing).
+- Designed the **Role-Based Access Control (RBAC)** architecture to protect routes.
+- Executed core **Integration** bug fixes (resolving schema errors, repairing broken repository imports, fixing Docker test paths).
+- Integrated **Scalar API Docs** and handled the **Dockerization** Bonus requirement.
+
+#### Tena (Orders & Business Logic)
+- Scaffolded Orders and OrderItems logic, transition flows, and inventory deductions limits. *(Testing & final review needed).*
+
+#### Sondos (Products Module)
+- Implemented Products CRUD operations, search, pagination, and response models.
+
+#### Hanfy (Categories, Cart & Caching)
+- Structured the Categories and Wishlist/Cart functionalities.
+- Scaled the application by applying the Redis `CacheService`.
+
+#### Mahmoud (Logging & QA)
+- Managed initial Logging middleware setup and dashboard metrics, keeping watch over Postman and documentation compilation.
+
+---
+
 ## 📄 License
 This project is licensed under the MIT License.

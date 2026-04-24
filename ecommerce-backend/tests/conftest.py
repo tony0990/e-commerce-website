@@ -1,3 +1,5 @@
+import os
+import sys
 import asyncio
 import pytest
 from typing import AsyncGenerator
@@ -5,7 +7,11 @@ from httpx import AsyncClient, ASGITransport
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.pool import StaticPool
 
+# Add project root to sys.path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from app.main import app
+
 from app.core.database import Base, get_db
 from app.core.config import settings
 
@@ -28,21 +34,15 @@ TestAsyncSessionLocal = async_sessionmaker(
     autoflush=False,
 )
 
-@pytest.fixture(scope="session")
-def event_loop():
-    """Create an instance of the default event loop for each test case."""
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
-
 @pytest.fixture(scope="session", autouse=True)
-async def setup_test_db():
+async def setup_db():
     """Setup and teardown the test database."""
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
+
 
 @pytest.fixture
 async def db_session() -> AsyncGenerator[AsyncSession, None]:

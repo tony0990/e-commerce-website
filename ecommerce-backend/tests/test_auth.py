@@ -18,7 +18,7 @@ async def test_register_user(client: AsyncClient):
     data = response.json()
     assert data["success"] is True
     assert data["message"] == SuccessMessages.USER_CREATED
-    assert data["data"]["email"] == "test@example.com"
+    assert data["data"]["user"]["email"] == "test@example.com"
 
 @pytest.mark.asyncio
 async def test_login_user(client: AsyncClient):
@@ -42,8 +42,9 @@ async def test_login_user(client: AsyncClient):
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert data["success"] is True
-    assert "access_token" in data["data"]
-    assert "refresh_token" in data["data"]
+    assert "access_token" in data["data"]["tokens"]
+    assert "refresh_token" in data["data"]["tokens"]
+
 
 @pytest.mark.asyncio
 async def test_login_invalid_credentials(client: AsyncClient):

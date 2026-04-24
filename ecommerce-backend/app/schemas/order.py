@@ -43,7 +43,7 @@ class OrderCreate(OrderBase):
 class OrderUpdate(BaseModel):
     status: Optional[OrderStatus] = None
     payment_status: Optional[PaymentStatus] = None
-    tracking_number: Optional[String] = None
+    tracking_number: Optional[str] = None
 
 
 class OrderResponse(OrderBase):
