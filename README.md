@@ -171,7 +171,3 @@ docker-compose exec api python scripts/create_admin.py
 #### Mahmoud (Logging & QA)
 - Managed initial Logging middleware setup and dashboard metrics, keeping watch over Postman and documentation compilation.
 
----
-
-## 📄 License
-This project is licensed under the MIT License.
