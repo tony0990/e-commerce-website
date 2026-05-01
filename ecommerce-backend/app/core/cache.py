@@ -1,14 +1,9 @@
-# app/core/cache.py
-
-
 import redis
 import json
 from typing import Any, Optional
-import logging
+from loguru import logger
 
-logger = logging.getLogger(__name__)
-
-# Global Redis client 
+# Global Redis client
 try:
     redis_client = redis.Redis(
         host="localhost",
@@ -20,19 +15,20 @@ try:
     )
     # Test connection
     redis_client.ping()
-    logger.info(" Redis connected successfully")
+    logger.success("Redis connected successfully")
 except Exception as e:
-    logger.warning(f" Redis not available: {e}. Caching will be disabled.")
+    logger.warning(f"Redis not available: {e}. Caching will be disabled.")
     redis_client = None
 
 
-def get(key: str) -> Optional[Any]:
+def get_cache(key: str) -> Optional[Any]:
     """Get data from cache"""
     if not redis_client:
         return None
     try:
         data = redis_client.get(key)
         if data:
+            logger.info(f"The Data Has Successfully Gathered For The Key: {key}")
             return json.loads(data)
         return None
     except Exception as e:
@@ -40,28 +36,30 @@ def get(key: str) -> Optional[Any]:
         return None
 
 
-def set(key: str, value: Any, expire: int = 300) -> bool:
+def set_cache(key: str, value: Any, expire: int = 300) -> bool:
     """Set data in cache (expire in seconds, default 5 minutes)"""
     if not redis_client:
         return False
     try:
         redis_client.set(
-            key, 
-            json.dumps(value, default=str), 
+            key,
+            json.dumps(value, default=str),
             ex=expire
         )
+        logger.info(f"The Key Saved Successfully: {key}")
         return True
     except Exception as e:
         logger.error(f"Cache set error: {e}")
         return False
 
 
-def delete(key: str) -> bool:
+def delete_cache(key: str) -> bool:
     """Delete key from cache"""
     if not redis_client:
         return False
     try:
         redis_client.delete(key)
+        logger.info(f"The Cache Has Successfully Deleted For Key: {key}")
         return True
     except Exception as e:
         logger.error(f"Cache delete error: {e}")
@@ -76,6 +74,7 @@ def delete_pattern(pattern: str = "product:*") -> bool:
         keys = redis_client.keys(pattern)
         if keys:
             redis_client.delete(*keys)
+            logger.info(f"Successfully deleted {len(keys)} keys matching pattern: {pattern}")
         return True
     except Exception as e:
         logger.error(f"Cache delete_pattern error: {e}")
