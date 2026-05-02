@@ -65,9 +65,12 @@ class AuthService:
         return {
             "message": SuccessMessages.USER_CREATED,
             "success": True,
-            "user": self._user_to_dict(user),
-            "tokens": tokens,
+            "data": {
+                "user": self._user_to_dict(user),
+                "tokens": tokens,
+            }
         }
+
 
     async def login(self, email: str, password: str) -> dict:
         """
@@ -92,9 +95,12 @@ class AuthService:
         return {
             "message": SuccessMessages.LOGIN_SUCCESS,
             "success": True,
-            "user": self._user_to_dict(user),
-            "tokens": tokens,
+            "data": {
+                "user": self._user_to_dict(user),
+                "tokens": tokens,
+            }
         }
+
 
     async def refresh_token(self, refresh_token_str: str) -> dict:
         """

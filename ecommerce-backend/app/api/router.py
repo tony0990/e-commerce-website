@@ -1,7 +1,7 @@
 
 
 from fastapi import APIRouter
-from app.api.v1 import auth, users, products, orders, wishlist
+from app.api.v1 import auth, users, products, orders, wishlist, dashboard
 from app.core.constants import API_V1_PREFIX
 
 # Main API router
@@ -13,3 +13,4 @@ api_router.include_router(users.router)
 api_router.include_router(products.router)
 api_router.include_router(orders.router)
 api_router.include_router(wishlist.router)
+api_router.include_router(dashboard.router)

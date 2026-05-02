@@ -8,27 +8,34 @@ from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.exceptions import RequestValidationError
 from app.core.config import settings
 from app.core.database import create_tables, engine
-from app.core.seeder import seed_data
 from app.api.router import api_router
+from loguru import logger
+import sys
+
+# Configure Loguru
+logger.remove()
+logger.add(sys.stdout, format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}", level=settings.LOG_LEVEL)
+logger.add(settings.LOG_FILE, rotation="10 MB", retention="10 days", level=settings.LOG_LEVEL, format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}")
+
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan events - startup and shutdown."""
-    # Startup: Create database tables and seed
+    # Startup: Create database tables
     await create_tables()
-    await seed_data()
-    print(f"[*] {settings.APP_NAME} v{settings.APP_VERSION} starting up...")
-    print(f"[*] Environment: {settings.APP_ENV}")
-    print(f"[*] Docs: http://{settings.HOST}:{settings.PORT}/docs")
+    logger.info(f"[*] {settings.APP_NAME} v{settings.APP_VERSION} starting up...")
+    logger.info(f"[*] Environment: {settings.APP_ENV}")
+    logger.info(f"[*] Docs: http://{settings.HOST}:{settings.PORT}/docs")
+
     yield
     # Shutdown: Cleanup
     await engine.dispose()
-    print(f"[*] {settings.APP_NAME} shutting down...")
+    logger.info(f"[*] {settings.APP_NAME} shutting down...")
 
 
 # Create FastAPI application
@@ -40,9 +47,8 @@ app = FastAPI(
         "Supports JWT authentication, role-based access control, "
         "user management, and more."
     ),
-    docs_url=None,
-    redoc_url=None,
-    openapi_url=None,
+    docs_url=None, # Disabled default Swagger UI in favor of Scalar
+    redoc_url="/redoc",
     lifespan=lifespan,
 )
 
@@ -54,10 +60,14 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
-    allow_credentials=False,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+from app.middleware.logging_middleware import LoggingMiddleware
+app.add_middleware(LoggingMiddleware)
+
 
 
 # ========================
@@ -118,6 +128,26 @@ async def root():
         "docs": "/docs",
         "health": "/health",
     }
+
+
+@app.get("/docs", include_in_schema=False)
+async def scalar_html():
+    """Scalar documentation page."""
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>API Docs</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </head>
+      <body>
+        <script id="api-reference" data-url="/openapi.json"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+      </body>
+    </html>
+    """
+    return HTMLResponse(html)
 
 
 @app.get("/health", tags=["Health"])

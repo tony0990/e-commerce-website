@@ -1,102 +1,49 @@
-"""
-Cache Service (Hanfy + Tony)
-==============================
-Simple in-memory caching service.
-Falls back gracefully when Redis is unavailable.
-"""
 
-import json
-import time
-from typing import Optional, Any, Dict
-from app.core.config import settings
 
+from app.core.cache import get, set, delete, delete_pattern
+from typing import Any, Optional
+import logging
+
+logger = logging.getLogger(__name__)
 
 class CacheService:
     """
-    In-memory cache service with TTL support.
-    Uses a simple dictionary-based cache as fallback when Redis is unavailable.
+    Service layer for cache operations.
+    
     """
 
-    def __init__(self):
-        self._cache: Dict[str, Dict[str, Any]] = {}
-        self._default_ttl = settings.CACHE_EXPIRE_SECONDS
+    @staticmethod
+    def get(key: str) -> Optional[Any]:
+        """Get item from cache"""
+        return get(key)
 
-    async def get(self, key: str) -> Optional[Any]:
-        """
-        Get a value from cache.
+    @staticmethod
+    def set(key: str, value: Any, expire: int = 300) -> bool:
+        """Set item in cache with expiration time"""
+        return set(key, value, expire)
 
-        Args:
-            key: The cache key.
+    @staticmethod
+    def delete(key: str) -> bool:
+        """Delete item from cache"""
+        return delete(key)
 
-        Returns:
-            Cached value or None if expired/not found.
-        """
-        if key in self._cache:
-            entry = self._cache[key]
-            if entry["expires_at"] > time.time():
-                return entry["value"]
-            else:
-                del self._cache[key]
-        return None
+    @staticmethod
+    def delete_pattern(pattern: str) -> bool:
+        """Delete multiple keys using pattern (e.g., 'product:*')"""
+        return delete_pattern(pattern)
 
-    async def set(self, key: str, value: Any, ttl: Optional[int] = None) -> bool:
-        """
-        Set a value in cache with TTL.
-
-        Args:
-            key: The cache key.
-            value: The value to cache.
-            ttl: Time to live in seconds. Uses default if not specified.
-
-        Returns:
-            True if successful.
-        """
-        ttl = ttl or self._default_ttl
-        self._cache[key] = {
-            "value": value,
-            "expires_at": time.time() + ttl,
-        }
-        return True
-
-    async def delete(self, key: str) -> bool:
-        """Delete a key from cache."""
-        if key in self._cache:
-            del self._cache[key]
-            return True
-        return False
-
-    async def exists(self, key: str) -> bool:
-        """Check if a key exists and is not expired."""
-        value = await self.get(key)
-        return value is not None
-
-    async def clear(self) -> bool:
-        """Clear all cached entries."""
-        self._cache.clear()
-        return True
-
-    async def clear_pattern(self, pattern: str) -> int:
-        """
-        Clear cache keys matching a pattern.
-        Simple glob-style matching (prefix*).
-        """
-        prefix = pattern.rstrip("*")
-        keys_to_delete = [k for k in self._cache if k.startswith(prefix)]
-        for key in keys_to_delete:
-            del self._cache[key]
-        return len(keys_to_delete)
-
-    async def get_stats(self) -> dict:
-        """Get cache statistics."""
-        now = time.time()
-        active_keys = sum(1 for v in self._cache.values() if v["expires_at"] > now)
-        expired_keys = len(self._cache) - active_keys
-        return {
-            "total_keys": len(self._cache),
-            "active_keys": active_keys,
-            "expired_keys": expired_keys,
-        }
-
-
-# Singleton cache instance
-cache_service = CacheService()
+    @staticmethod
+    def invalidate_product_cache(product_id: Optional[int] = None):
+        """Invalidate all product-related cache when data changes"""
+        try:
+            # Invalidate list cache
+            delete_pattern("product:all*")
+            delete_pattern("product:page*")
+            
+            # Invalidate single product cache if ID is provided
+            if product_id:
+                delete(f"product:{product_id}")
+            
+            logger.info(f"Product cache invalidated {'for ID ' + str(product_id) if product_id else 'globally'}")
+        except Exception as e:
+            logger.error(f"Failed to invalidate product cache: {e}")
