@@ -9,9 +9,9 @@ from typing import Any, Optional
 import logging
 
 from app.core.cache import (
-    get,
-    set,
-    delete,
+    get_cache,
+    set_cache,
+    delete_cache,
     delete_pattern,
 )
 
@@ -26,14 +26,14 @@ class CacheService:
     """
 
     @staticmethod
-    async def get(key: str) -> Optional[Any]:
+    def get(key: str) -> Optional[Any]:
         """
         Retrieve item from cache by key.
         """
-        return get(key)
+        return get_cache(key)
 
     @staticmethod
-    async def set(
+    def set(
         key: str,
         value: Any,
         expire: int = 300,
@@ -44,27 +44,23 @@ class CacheService:
         Default expiration:
         300 seconds = 5 minutes
         """
-        return set(key, value, expire)
+        return set_cache(key, value, expire)
 
     @staticmethod
-    async def delete(key: str) -> bool:
+    def delete(key: str) -> bool:
         """
         Delete one cache key.
         """
-        return delete(key)
+        return delete_cache(key)
 
     @staticmethod
-    async def delete_pattern(pattern: str) -> bool:
+    def delete_pattern(pattern: str) -> bool:
         """
         Delete multiple keys using a pattern.
 
         Example:
         product:*
         """
-        return delete_pattern(pattern)
-
-    @staticmethod
-    async def clear_pattern(pattern: str) -> bool:
         return delete_pattern(pattern)
 
     @staticmethod
@@ -79,13 +75,12 @@ class CacheService:
         - Product update
         - Product delete
         """
-
         try:
             delete_pattern("product:all*")
             delete_pattern("product:page*")
 
             if product_id:
-                delete(f"product:{product_id}")
+                delete_cache(f"product:{product_id}")
 
             logger.info(
                 f"Product cache invalidated "

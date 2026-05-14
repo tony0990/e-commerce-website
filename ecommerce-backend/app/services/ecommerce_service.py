@@ -31,7 +31,7 @@ class ProductService:
     async def get_products(self, page: int, page_size: int, category_id: Optional[int], search: Optional[str]):
         # Cache key based on query params
         cache_key = f"products:list:p{page}:s{page_size}:c{category_id or 0}:q{search or ''}"
-        cached_data = await cache_service.get(cache_key)
+        cached_data = cache_service.get(cache_key)
         if cached_data:
             return cached_data["items"], cached_data["total"]
 
@@ -45,7 +45,7 @@ class ProductService:
 
     async def get_product(self, product_id: int):
         cache_key = f"product:{product_id}"
-        cached_product = await cache_service.get(cache_key)
+        cached_product = cache_service.get(cache_key)
         if cached_product:
             # Return as dict or convert back to model if needed by caller
             # For simplicity, most callers expect the model
@@ -57,56 +57,48 @@ class ProductService:
         
         # Cache serialized product
         serialized = ProductResponse.model_validate(product).model_dump(mode="json")
-        await cache_service.set(cache_key, serialized)
+        cache_service.set(cache_key, serialized)
         return product
 
     async def create_product(self, data: ProductCreate):
         product = Product(**data.model_dump())
         result = await self.product_repo.create(product)
         # Invalidate lists
-        await cache_service.clear_pattern("products:list:*")
+        cache_service.delete_pattern("products:list:*")
         return result
 
     async def update_product(self, product_id: int, data: ProductUpdate):
-        product = await self.product_repo.get_by_id(product_id)
-        if not product:
-            raise NotFoundException("Product not found")
         result = await self.product_repo.update(product_id, **data.model_dump(exclude_unset=True))
         # Invalidate specific product and lists
-        await cache_service.delete(f"product:{product_id}")
-        await cache_service.clear_pattern("products:list:*")
+        cache_service.delete(f"product:{product_id}")
+        cache_service.delete_pattern("products:list:*")
         return result
 
     async def delete_product(self, product_id: int):
         result = await self.product_repo.delete(product_id)
         # Invalidate specific product and lists
-        await cache_service.delete(f"product:{product_id}")
-        await cache_service.clear_pattern("products:list:*")
+        cache_service.delete(f"product:{product_id}")
+        cache_service.delete_pattern("products:list:*")
         return result
 
 
     async def get_categories(self):
         cache_key = "categories:all"
-        cached = await cache_service.get(cache_key)
+        cached = cache_service.get(cache_key)
         if cached: return cached
         
         categories = await self.category_repo.get_all()
         # Serialize list of objects
         from app.schemas.product import CategoryResponse
         serialized = [CategoryResponse.model_validate(c).model_dump(mode="json") for c in categories]
-        await cache_service.set(cache_key, serialized)
+        cache_service.set(cache_key, serialized)
         return categories
 
     async def create_category(self, data: CategoryCreate):
-        import sqlalchemy.exc
         category = Category(**data.model_dump())
-        try:
-            result = await self.category_repo.create(category)
-            await cache_service.delete("categories:all")
-            return result
-        except sqlalchemy.exc.IntegrityError:
-            await self.db.rollback()
-            raise BadRequestException("Category with this name already exists")
+        result = await self.category_repo.create(category)
+        cache_service.delete("categories:all")
+        return result
 
 
 
@@ -184,18 +176,10 @@ class WishlistService:
 
     async def add_to_wishlist(self, user_id: int, product_id: int):
         if await self.wishlist_repo.exists(user_id, product_id):
-            raise BadRequestException("Already in wishlist")
-        
-        from app.repositories.product_repository import ProductRepository
-        product_repo = ProductRepository(self.db)
-        product = await product_repo.get_by_id(product_id)
-        if not product:
-            raise NotFoundException("Product not found")
+            return {"message": "Already in wishlist"}
         
         wish_item = Wishlist(user_id=user_id, product_id=product_id)
-        created_item = await self.wishlist_repo.create(wish_item)
-        created_item.product = product
-        return created_item
+        return await self.wishlist_repo.create(wish_item)
 
     async def remove_from_wishlist(self, user_id: int, product_id: int):
         # Implementation of delete by user_id and product_id
