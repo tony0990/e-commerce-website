@@ -1,12 +1,12 @@
-import redis
+import os
 import json
+import redis
 from typing import Any, Optional
 from loguru import logger
 
-# Global Redis client
 try:
     redis_client = redis.Redis(
-        host="localhost",
+        host=os.getenv("REDIS_HOST", "localhost"), # يُفضل وضع localhost كبديل افتراضي لتسهيل التشغيل بدون دوكر
         port=6379,
         db=0,
         decode_responses=True,
@@ -28,7 +28,7 @@ def get_cache(key: str) -> Optional[Any]:
     try:
         data = redis_client.get(key)
         if data:
-            logger.info(f"The Data Has Successfully Gathered For The Key: {key}")
+            logger.info(f"The Data Was Successfully Gathered For The Key: {key}")
             return json.loads(data)
         return None
     except Exception as e:
@@ -59,7 +59,7 @@ def delete_cache(key: str) -> bool:
         return False
     try:
         redis_client.delete(key)
-        logger.info(f"The Cache Has Successfully Deleted For Key: {key}")
+        logger.info(f"The Cache Was Successfully Deleted For Key: {key}")
         return True
     except Exception as e:
         logger.error(f"Cache delete error: {e}")
@@ -67,14 +67,16 @@ def delete_cache(key: str) -> bool:
 
 
 def delete_pattern(pattern: str = "product:*") -> bool:
-    """Delete multiple keys by pattern (useful for invalidation)"""
+    """Delete multiple keys by pattern (Safe for Production)"""
     if not redis_client:
         return False
     try:
-        keys = redis_client.keys(pattern)
-        if keys:
-            redis_client.delete(*keys)
-            logger.info(f"Successfully deleted {len(keys)} keys matching pattern: {pattern}")
+        # استخدام scan_iter بدلاً من keys() لحماية السيرفر من التوقف
+        keys_to_delete = list(redis_client.scan_iter(match=pattern))
+        
+        if keys_to_delete:
+            redis_client.delete(*keys_to_delete)
+            logger.info(f"Successfully deleted {len(keys_to_delete)} keys matching pattern: {pattern}")
         return True
     except Exception as e:
         logger.error(f"Cache delete_pattern error: {e}")

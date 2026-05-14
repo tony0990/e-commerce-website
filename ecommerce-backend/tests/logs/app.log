@@ -1,0 +1,68 @@
+2026-05-13 23:17:39 | INFO | Incoming Request: POST /api/v1/cart/items | Client: 127.0.0.1
+2026-05-13 23:17:39 | INFO | Response: POST /api/v1/cart/items | Status: 201 | Time: 24.49ms
+2026-05-13 23:17:39 | INFO | Incoming Request: POST /api/v1/cart/items | Client: 127.0.0.1
+2026-05-13 23:17:39 | INFO | Response: POST /api/v1/cart/items | Status: 201 | Time: 18.43ms
+2026-05-13 23:17:39 | INFO | Incoming Request: GET /api/v1/cart/ | Client: 127.0.0.1
+2026-05-13 23:17:39 | INFO | Response: GET /api/v1/cart/ | Status: 200 | Time: 16.80ms
+2026-05-13 23:17:39 | INFO | Incoming Request: POST /api/v1/cart/items | Client: 127.0.0.1
+2026-05-13 23:17:39 | INFO | Response: POST /api/v1/cart/items | Status: 201 | Time: 21.73ms
+2026-05-13 23:17:39 | INFO | Incoming Request: GET /api/v1/cart/ | Client: 127.0.0.1
+2026-05-13 23:17:39 | INFO | Response: GET /api/v1/cart/ | Status: 200 | Time: 11.23ms
+2026-05-13 23:17:39 | INFO | Incoming Request: PUT /api/v1/cart/items/3 | Client: 127.0.0.1
+2026-05-13 23:17:39 | INFO | Response: PUT /api/v1/cart/items/3 | Status: 200 | Time: 20.16ms
+2026-05-13 23:17:39 | INFO | Incoming Request: POST /api/v1/cart/items | Client: 127.0.0.1
+2026-05-13 23:17:39 | INFO | Response: POST /api/v1/cart/items | Status: 201 | Time: 37.02ms
+2026-05-13 23:17:39 | INFO | Incoming Request: GET /api/v1/cart/ | Client: 127.0.0.1
+2026-05-13 23:17:39 | INFO | Response: GET /api/v1/cart/ | Status: 200 | Time: 10.88ms
+2026-05-13 23:17:39 | INFO | Incoming Request: DELETE /api/v1/cart/items/4 | Client: 127.0.0.1
+2026-05-13 23:17:39 | INFO | Response: DELETE /api/v1/cart/items/4 | Status: 204 | Time: 11.93ms
+2026-05-13 23:17:39 | INFO | Incoming Request: GET /api/v1/cart/ | Client: 127.0.0.1
+2026-05-13 23:17:39 | INFO | Response: GET /api/v1/cart/ | Status: 200 | Time: 9.34ms
+2026-05-13 23:17:39 | INFO | Incoming Request: POST /api/v1/cart/items | Client: 127.0.0.1
+2026-05-13 23:17:39 | INFO | Response: POST /api/v1/cart/items | Status: 201 | Time: 18.39ms
+2026-05-13 23:17:39 | INFO | Incoming Request: DELETE /api/v1/cart/ | Client: 127.0.0.1
+2026-05-13 23:17:39 | INFO | Response: DELETE /api/v1/cart/ | Status: 204 | Time: 10.20ms
+2026-05-13 23:17:39 | INFO | Incoming Request: GET /api/v1/cart/ | Client: 127.0.0.1
+2026-05-13 23:17:39 | INFO | Response: GET /api/v1/cart/ | Status: 200 | Time: 10.28ms
+2026-05-13 23:17:39 | INFO | Incoming Request: POST /api/v1/products/categories | Client: 127.0.0.1
+2026-05-13 23:17:39 | INFO | Response: POST /api/v1/products/categories | Status: 201 | Time: 26.21ms
+2026-05-13 23:17:39 | INFO | Incoming Request: POST /api/v1/products/categories | Client: 127.0.0.1
+2026-05-13 23:17:39 | INFO | Response: POST /api/v1/products/categories | Status: 201 | Time: 15.10ms
+2026-05-13 23:17:39 | INFO | Incoming Request: GET /api/v1/products/categories | Client: 127.0.0.1
+2026-05-13 23:17:39 | INFO | Response: GET /api/v1/products/categories | Status: 200 | Time: 7.32ms
+2026-05-13 23:17:39 | INFO | Incoming Request: POST /api/v1/products/categories | Client: 127.0.0.1
+2026-05-13 23:17:39 | WARNING | Response: POST /api/v1/products/categories | Status: 401 | Time: 4.63ms
+2026-05-13 23:53:10 | INFO | Incoming Request: POST /api/v1/products/categories | Client: 127.0.0.1
+2026-05-13 23:53:10 | INFO | Response: POST /api/v1/products/categories | Status: 201 | Time: 24.54ms
+2026-05-13 23:53:10 | INFO | Incoming Request: POST /api/v1/products/categories | Client: 127.0.0.1
+2026-05-13 23:53:10 | INFO | Response: POST /api/v1/products/categories | Status: 201 | Time: 29.81ms
+2026-05-13 23:53:10 | INFO | Incoming Request: GET /api/v1/products/categories | Client: 127.0.0.1
+2026-05-13 23:53:10 | INFO | Response: GET /api/v1/products/categories | Status: 200 | Time: 10.21ms
+2026-05-13 23:53:10 | INFO | Incoming Request: POST /api/v1/products/categories | Client: 127.0.0.1
+2026-05-13 23:53:10 | WARNING | Response: POST /api/v1/products/categories | Status: 401 | Time: 6.89ms
+2026-05-14 00:19:12 | INFO | Incoming Request: POST /api/v1/cart/items | Client: 127.0.0.1
+2026-05-14 00:19:12 | INFO | Response: POST /api/v1/cart/items | Status: 201 | Time: 29.79ms
+2026-05-14 00:19:12 | INFO | Incoming Request: POST /api/v1/cart/items | Client: 127.0.0.1
+2026-05-14 00:19:12 | INFO | Response: POST /api/v1/cart/items | Status: 201 | Time: 19.51ms
+2026-05-14 00:19:12 | INFO | Incoming Request: GET /api/v1/cart/ | Client: 127.0.0.1
+2026-05-14 00:19:12 | INFO | Response: GET /api/v1/cart/ | Status: 200 | Time: 14.18ms
+2026-05-14 00:19:12 | INFO | Incoming Request: POST /api/v1/cart/items | Client: 127.0.0.1
+2026-05-14 00:19:12 | INFO | Response: POST /api/v1/cart/items | Status: 201 | Time: 22.05ms
+2026-05-14 00:19:12 | INFO | Incoming Request: GET /api/v1/cart/ | Client: 127.0.0.1
+2026-05-14 00:19:12 | INFO | Response: GET /api/v1/cart/ | Status: 200 | Time: 10.38ms
+2026-05-14 00:19:12 | INFO | Incoming Request: PUT /api/v1/cart/items/3 | Client: 127.0.0.1
+2026-05-14 00:19:12 | INFO | Response: PUT /api/v1/cart/items/3 | Status: 200 | Time: 20.16ms
+2026-05-14 00:19:12 | INFO | Incoming Request: POST /api/v1/cart/items | Client: 127.0.0.1
+2026-05-14 00:19:12 | INFO | Response: POST /api/v1/cart/items | Status: 201 | Time: 25.09ms
+2026-05-14 00:19:12 | INFO | Incoming Request: GET /api/v1/cart/ | Client: 127.0.0.1
+2026-05-14 00:19:12 | INFO | Response: GET /api/v1/cart/ | Status: 200 | Time: 13.21ms
+2026-05-14 00:19:12 | INFO | Incoming Request: DELETE /api/v1/cart/items/4 | Client: 127.0.0.1
+2026-05-14 00:19:12 | INFO | Response: DELETE /api/v1/cart/items/4 | Status: 204 | Time: 16.95ms
+2026-05-14 00:19:12 | INFO | Incoming Request: GET /api/v1/cart/ | Client: 127.0.0.1
+2026-05-14 00:19:12 | INFO | Response: GET /api/v1/cart/ | Status: 200 | Time: 13.94ms
+2026-05-14 00:19:12 | INFO | Incoming Request: POST /api/v1/cart/items | Client: 127.0.0.1
+2026-05-14 00:19:12 | INFO | Response: POST /api/v1/cart/items | Status: 201 | Time: 21.48ms
+2026-05-14 00:19:12 | INFO | Incoming Request: DELETE /api/v1/cart/ | Client: 127.0.0.1
+2026-05-14 00:19:12 | INFO | Response: DELETE /api/v1/cart/ | Status: 204 | Time: 11.90ms
+2026-05-14 00:19:12 | INFO | Incoming Request: GET /api/v1/cart/ | Client: 127.0.0.1
+2026-05-14 00:19:12 | INFO | Response: GET /api/v1/cart/ | Status: 200 | Time: 11.66ms
