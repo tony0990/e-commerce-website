@@ -15,6 +15,7 @@ from typing import List
 from uuid import uuid4
 
 from sqlalchemy.ext.asyncio import AsyncSession
+from loguru import logger
 
 from app.core.constants import OrderStatus, PaymentStatus, ErrorMessages
 from app.models.order import Order
@@ -84,6 +85,7 @@ class OrderService:
         order_items: List[OrderItem] = []
         product_map = {}
         seen_products = set()
+        product_names = []
 
         for item in data.items:
             if item.product_id in seen_products:
@@ -106,6 +108,7 @@ class OrderService:
             total_amount += line_total
 
             product_map[item.product_id] = product
+            product_names.append(f"{product.name} (x{item.quantity}, ${product.price})")
 
             order_items.append(
                 OrderItem(
@@ -153,6 +156,17 @@ class OrderService:
 
         if not created_order:
             raise NotFoundException(ErrorMessages.ORDER_NOT_FOUND)
+
+        # Log order placement with full details
+        logger.info(
+            f"[ORDER] Order placed: order_id={order.id}, "
+            f"user_id={user_id}, "
+            f"total=${total_amount:.2f}, "
+            f"payment={data.payment_method}, "
+            f"city={data.shipping_city}, country={data.shipping_country}, "
+            f"products=[{', '.join(product_names)}], "
+            f"tracking={order.tracking_number}"
+        )
 
         return created_order
 
@@ -221,6 +235,8 @@ class OrderService:
         if not order:
             raise NotFoundException(ErrorMessages.ORDER_NOT_FOUND)
 
+        old_status = order.status
+
         self._validate_status_transition(
             current_status=order.status,
             new_status=new_status,
@@ -229,6 +245,13 @@ class OrderService:
         updated_order = await self.order_repo.update_status(
             order=order,
             new_status=new_status,
+        )
+
+        # Log status change
+        logger.info(
+            f"[ORDER] Status changed: order_id={order_id}, "
+            f"user_id={order.user_id}, "
+            f"from={old_status.value}, to={new_status.value}"
         )
 
         return updated_order

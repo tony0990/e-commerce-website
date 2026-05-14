@@ -41,7 +41,7 @@ TestAsyncSessionLocal = async_sessionmaker(
 )
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="function", autouse=True)
 async def setup_db():
     """
     Create all database tables before tests,

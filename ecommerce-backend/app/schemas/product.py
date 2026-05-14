@@ -37,9 +37,13 @@ class ProductBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     description: str
     price: float = Field(..., gt=0)
+    original_price: Optional[float] = None
     stock: int = Field(default=0, ge=0)
     image_url: Optional[str] = None
     is_active: bool = True
+    is_offer: bool = False
+    offer_price: Optional[float] = None
+    is_sold_out: bool = False
     category_id: int
 
 
@@ -51,9 +55,13 @@ class ProductUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     price: Optional[float] = None
+    original_price: Optional[float] = None
     stock: Optional[int] = None
     image_url: Optional[str] = None
     is_active: Optional[bool] = None
+    is_offer: Optional[bool] = None
+    offer_price: Optional[float] = None
+    is_sold_out: Optional[bool] = None
     category_id: Optional[int] = None
 
 

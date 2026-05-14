@@ -24,6 +24,7 @@ from app.utils.exceptions import (
     ConflictException,
 )
 from app.core.config import settings
+from loguru import logger
 
 
 class AuthService:
@@ -59,6 +60,13 @@ class AuthService:
         )
         user = await self.user_repo.create(user)
 
+        # Log registration
+        logger.info(
+            f"[AUTH] New user registered: email={data.email}, "
+            f"name={data.first_name} {data.last_name}, "
+            f"user_id={user.id}, role={UserRole.USER.value}"
+        )
+
         # Generate tokens
         tokens = self._generate_tokens(user)
 
@@ -79,15 +87,24 @@ class AuthService:
         # Find user
         user = await self.user_repo.get_by_email(email)
         if not user:
+            logger.warning(f"[AUTH] Failed login attempt: email={email} (user not found)")
             raise UnauthorizedException(ErrorMessages.INVALID_CREDENTIALS)
 
         # Verify password
         if not verify_password(password, user.hashed_password):
+            logger.warning(f"[AUTH] Failed login attempt: email={email} (wrong password)")
             raise UnauthorizedException(ErrorMessages.INVALID_CREDENTIALS)
 
         # Check if active
         if not user.is_active:
+            logger.warning(f"[AUTH] Inactive user login attempt: email={email}, user_id={user.id}")
             raise UnauthorizedException(ErrorMessages.USER_INACTIVE)
+
+        # Log successful login
+        logger.info(
+            f"[AUTH] User logged in: email={email}, "
+            f"user_id={user.id}, role={user.role.value if isinstance(user.role, UserRole) else user.role}"
+        )
 
         # Generate tokens
         tokens = self._generate_tokens(user)
@@ -118,6 +135,8 @@ class AuthService:
         if not user or not user.is_active:
             raise UnauthorizedException(ErrorMessages.TOKEN_INVALID)
 
+        logger.info(f"[AUTH] Token refreshed for user_id={user_id}")
+
         tokens = self._generate_tokens(user)
         return {
             "message": "Token refreshed successfully",
@@ -142,6 +161,7 @@ class AuthService:
             raise BadRequestException("Current password is incorrect")
 
         await self.user_repo.update(user_id, hashed_password=hash_password(new_password))
+        logger.info(f"[AUTH] Password changed for user_id={user_id}, email={user.email}")
         return {"message": SuccessMessages.PASSWORD_CHANGED, "success": True}
 
     def _generate_tokens(self, user: User) -> dict:

@@ -26,15 +26,14 @@ class CacheService:
     """
 
     @staticmethod
-    def get(key: str) -> Optional[Any]:
+    async def get(key: str) -> Optional[Any]:
         """
         Retrieve item from cache by key.
         """
-
         return get(key)
 
     @staticmethod
-    def set(
+    async def set(
         key: str,
         value: Any,
         expire: int = 300,
@@ -45,26 +44,27 @@ class CacheService:
         Default expiration:
         300 seconds = 5 minutes
         """
-
         return set(key, value, expire)
 
     @staticmethod
-    def delete(key: str) -> bool:
+    async def delete(key: str) -> bool:
         """
         Delete one cache key.
         """
-
         return delete(key)
 
     @staticmethod
-    def delete_pattern(pattern: str) -> bool:
+    async def delete_pattern(pattern: str) -> bool:
         """
         Delete multiple keys using a pattern.
 
         Example:
         product:*
         """
+        return delete_pattern(pattern)
 
+    @staticmethod
+    async def clear_pattern(pattern: str) -> bool:
         return delete_pattern(pattern)
 
     @staticmethod

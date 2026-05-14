@@ -2,6 +2,7 @@ import time
 from fastapi import Request
 from loguru import logger
 from starlette.middleware.base import BaseHTTPMiddleware
+from app.api.v1.dashboard import record_metric
 
 
 class LoggingMiddleware(BaseHTTPMiddleware):
@@ -37,10 +38,14 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             else:
                 logger.info(log_msg)
                 
+            record_metric(status_code, path)
+                
             response.headers["X-Process-Time"] = str(process_time)
             return response
             
         except Exception as e:
             process_time = (time.time() - start_time) * 1000
-            logger.exception(f"Request Failed: {method} {path} | Error: {str(e)} | Time: {process_time:.2f}ms")
+            error_msg = str(e)
+            logger.error(f"Request Failed: {method} {path} | Error: {error_msg} | Time: {process_time:.2f}ms")
+            record_metric(500, path, error_msg)
             raise e

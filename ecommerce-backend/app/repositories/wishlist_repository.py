@@ -17,7 +17,15 @@ class WishlistRepository(BaseRepository[Wishlist]):
         super().__init__(Wishlist, db)
 
     async def get_user_wishlist(self, user_id: int) -> List[Wishlist]:
-        query = select(Wishlist).where(Wishlist.user_id == user_id)
+        from sqlalchemy.orm import selectinload
+        from app.models.product import Product
+        query = (
+            select(Wishlist)
+            .options(
+                selectinload(Wishlist.product).selectinload(Product.category)
+            )
+            .where(Wishlist.user_id == user_id)
+        )
         result = await self.db.execute(query)
         return list(result.scalars().all())
 

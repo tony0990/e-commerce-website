@@ -35,13 +35,17 @@ class Product(Base):
     name = Column(String(255), index=True, nullable=False)
     description = Column(Text, nullable=False)
     price = Column(Float, nullable=False)
+    original_price = Column(Float, nullable=True)
     stock = Column(Integer, default=0)
     image_url = Column(String(500), nullable=True)
     is_active = Column(Boolean, default=True)
+    is_offer = Column(Boolean, default=False)
+    offer_price = Column(Float, nullable=True)
+    is_sold_out = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
-    category = relationship("Category", back_populates="products")
+    category = relationship("Category", back_populates="products", lazy="selectin")
     # Wishlist relationship will be added later
 
     def __repr__(self):

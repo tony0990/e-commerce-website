@@ -68,6 +68,9 @@ class ProductService:
         return result
 
     async def update_product(self, product_id: int, data: ProductUpdate):
+        product = await self.product_repo.get_by_id(product_id)
+        if not product:
+            raise NotFoundException("Product not found")
         result = await self.product_repo.update(product_id, **data.model_dump(exclude_unset=True))
         # Invalidate specific product and lists
         await cache_service.delete(f"product:{product_id}")
@@ -95,10 +98,15 @@ class ProductService:
         return categories
 
     async def create_category(self, data: CategoryCreate):
+        import sqlalchemy.exc
         category = Category(**data.model_dump())
-        result = await self.category_repo.create(category)
-        await cache_service.delete("categories:all")
-        return result
+        try:
+            result = await self.category_repo.create(category)
+            await cache_service.delete("categories:all")
+            return result
+        except sqlalchemy.exc.IntegrityError:
+            await self.db.rollback()
+            raise BadRequestException("Category with this name already exists")
 
 
 
@@ -176,10 +184,18 @@ class WishlistService:
 
     async def add_to_wishlist(self, user_id: int, product_id: int):
         if await self.wishlist_repo.exists(user_id, product_id):
-            return {"message": "Already in wishlist"}
+            raise BadRequestException("Already in wishlist")
+        
+        from app.repositories.product_repository import ProductRepository
+        product_repo = ProductRepository(self.db)
+        product = await product_repo.get_by_id(product_id)
+        if not product:
+            raise NotFoundException("Product not found")
         
         wish_item = Wishlist(user_id=user_id, product_id=product_id)
-        return await self.wishlist_repo.create(wish_item)
+        created_item = await self.wishlist_repo.create(wish_item)
+        created_item.product = product
+        return created_item
 
     async def remove_from_wishlist(self, user_id: int, product_id: int):
         # Implementation of delete by user_id and product_id

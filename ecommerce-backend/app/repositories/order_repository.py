@@ -168,3 +168,82 @@ class OrderRepository:
         refreshed_order = await self.get_by_id(order.id)
 
         return refreshed_order
+
+    async def get_stats(self) -> dict:
+        """
+        Get basic order statistics: total revenue, total orders, pending orders.
+        """
+        from sqlalchemy import func
+
+        result_revenue = await self.db.execute(select(func.sum(Order.total_amount)))
+        total_revenue = result_revenue.scalar() or 0.0
+
+        result_orders = await self.db.execute(select(func.count(Order.id)))
+        total_orders = result_orders.scalar() or 0
+
+        result_pending = await self.db.execute(
+            select(func.count(Order.id)).where(Order.status == OrderStatus.PENDING)
+        )
+        pending_orders = result_pending.scalar() or 0
+
+        return {
+            "total_revenue": total_revenue,
+            "total_orders": total_orders,
+            "pending_orders": pending_orders,
+        }
+
+    async def get_sales_per_day(self, days: int = 30) -> List[dict]:
+        """
+        Get total sales per day for the last X days.
+        """
+        from sqlalchemy import func, cast, String
+        from datetime import datetime, timedelta, timezone
+
+        start_date = datetime.now(timezone.utc) - timedelta(days=days)
+
+        query = (
+            select(
+                func.substr(cast(Order.created_at, String), 1, 10).label('date'),
+                func.sum(Order.total_amount).label('revenue')
+            )
+            .where(Order.created_at >= start_date)
+            .group_by('date')
+            .order_by('date')
+        )
+        
+        result = await self.db.execute(query)
+        rows = result.all()
+        
+        return [{"date": str(r.date), "revenue": float(r.revenue)} for r in rows]
+
+    async def get_top_selling_products(self, limit: int = 5) -> List[dict]:
+        """
+        Get the top selling products based on order quantities.
+        """
+        from sqlalchemy import func, desc
+
+        query = (
+            select(
+                Product.id,
+                Product.name,
+                Product.price,
+                Product.image_url,
+                func.sum(OrderItem.quantity).label('total_sold')
+            )
+            .join(OrderItem, Product.id == OrderItem.product_id)
+            .join(Order, Order.id == OrderItem.order_id)
+            .group_by(Product.id, Product.name, Product.price, Product.image_url)
+            .order_by(desc('total_sold'))
+            .limit(limit)
+        )
+        
+        result = await self.db.execute(query)
+        rows = result.all()
+        
+        return [{
+            "id": r.id, 
+            "name": r.name, 
+            "price": r.price, 
+            "image_url": r.image_url, 
+            "total_sold": r.total_sold
+        } for r in rows]
