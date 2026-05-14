@@ -6,14 +6,13 @@ from loguru import logger
 
 try:
     redis_client = redis.Redis(
-        host=os.getenv("REDIS_HOST", "localhost"), # يُفضل وضع localhost كبديل افتراضي لتسهيل التشغيل بدون دوكر
+        host=os.getenv("REDIS_HOST", "localhost"), 
         port=6379,
         db=0,
         decode_responses=True,
         socket_connect_timeout=2,
-        socket_timeout=2
+        socket_timeout=2,
     )
-    # Test connection
     redis_client.ping()
     logger.success("Redis connected successfully")
 except Exception as e:
@@ -22,7 +21,6 @@ except Exception as e:
 
 
 def get_cache(key: str) -> Optional[Any]:
-    """Get data from cache"""
     if not redis_client:
         return None
     try:
@@ -37,16 +35,10 @@ def get_cache(key: str) -> Optional[Any]:
 
 
 def set_cache(key: str, value: Any, expire: int = 300) -> bool:
-    """Set data in cache (expire in seconds, default 5 minutes)"""
     if not redis_client:
         return False
     try:
-        redis_client.set(
-            key,
-            json.dumps(value, default=str),
-            ex=expire
-        )
-        logger.info(f"The Key Saved Successfully: {key}")
+        redis_client.set(key, json.dumps(value, default=str), ex=expire)
         return True
     except Exception as e:
         logger.error(f"Cache set error: {e}")
@@ -54,7 +46,6 @@ def set_cache(key: str, value: Any, expire: int = 300) -> bool:
 
 
 def delete_cache(key: str) -> bool:
-    """Delete key from cache"""
     if not redis_client:
         return False
     try:
@@ -71,7 +62,7 @@ def delete_pattern(pattern: str = "product:*") -> bool:
     if not redis_client:
         return False
     try:
-        # استخدام scan_iter بدلاً من keys() لحماية السيرفر من التوقف
+        # Using scan_iter instead of keys() to protect the server from blocking
         keys_to_delete = list(redis_client.scan_iter(match=pattern))
         
         if keys_to_delete:
@@ -81,3 +72,16 @@ def delete_pattern(pattern: str = "product:*") -> bool:
     except Exception as e:
         logger.error(f"Cache delete_pattern error: {e}")
         return False
+
+
+# Aliases expected by app/services/cache_service.py
+def get(key: str) -> Optional[Any]:
+    return get_cache(key)
+
+
+def set(key: str, value: Any, expire: int = 300) -> bool:
+    return set_cache(key, value, expire)
+
+
+def delete(key: str) -> bool:
+    return delete_cache(key)

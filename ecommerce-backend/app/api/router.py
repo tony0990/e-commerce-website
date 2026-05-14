@@ -3,6 +3,7 @@
 from fastapi import APIRouter
 from app.api.v1 import auth, users, products, orders, wishlist, dashboard, cart
 from app.core.constants import API_V1_PREFIX
+from app.api.v1 import orders
 
 # Main API router
 api_router = APIRouter(prefix=API_V1_PREFIX)
