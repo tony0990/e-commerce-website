@@ -39,7 +39,7 @@ class ProductService:
         
         # Serialize for cache
         serialized_items = [ProductResponse.model_validate(item).model_dump(mode="json") for item in items]
-        await cache_service.set(cache_key, {"items": serialized_items, "total": total})
+        cache_service.set(cache_key, {"items": serialized_items, "total": total})
         
         return items, total
 

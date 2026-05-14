@@ -15,6 +15,7 @@ import { renderCheckoutPage }      from './pages/checkoutPage.js';
 import { renderOrdersPage }        from './pages/ordersPage.js';
 import { renderWishlistPage }      from './pages/wishlistPage.js';
 import { renderProfilePage }       from './pages/profilePage.js';
+import { renderCategoriesPage }    from './pages/categoriesPage.js';
 import { renderAdminPage }         from './pages/adminPage.js';
 
 // ── Initial render ──────────────────────────────────────────
@@ -70,10 +71,10 @@ async function route() {
     return renderProductDetailPage(content, parseInt(productMatch[1]));
   }
 
-  // Categories (redirect to products with filter)
-  if (hash === '#/category' || hash.startsWith('#/category')) {
+  // Categories
+  if (hash === '#/category' || hash === '#/categories') {
     document.title = 'Categories — PremiumStore';
-    return renderProductsPage(content);
+    return renderCategoriesPage(content);
   }
 
   // Cart
