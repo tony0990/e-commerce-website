@@ -11,7 +11,8 @@ from app.repositories.order_repository import OrderRepository
 from app.repositories.wishlist_repository import WishlistRepository
 from app.repositories.user_repository import UserRepository
 from app.models.product import Product, Category
-from app.models.order import Order, OrderItem
+from app.models.order import Order
+from app.models.order_item import OrderItem
 from app.models.wishlist import Wishlist
 from app.schemas.product import ProductCreate, ProductUpdate, CategoryCreate
 from app.schemas.order import OrderCreate
